@@ -1,6 +1,6 @@
 # Jixo Webpage
 
-Link: Developing--
+Link: https://jixo-website-26.vercel.app/
 --------------------------------------------------------------------------------------------
 ## Version 1.0--
 - Change the previous structure to new structure
