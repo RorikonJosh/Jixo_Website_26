@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import MiniHeader from '../components/stopheader';
-import '../styles/Stop.css';
+import '../styles/stop.css';
 
 export default function Stop() {
   const { t } = useTranslation();
