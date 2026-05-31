@@ -1,0 +1,106 @@
+{
+  "nav": {
+    "home": "Home",
+    "artworks": "Artworks",
+    "request": "Request",
+    "contact": "Contact"
+  },
+  "home": {
+    "greeting": "Hi! I'm kareya",
+    "usageNotice": "If you wish to use my artworks, please notify me and provide a link.",
+    "aiWarning": "※ AI training prohibited ※",
+    "commission": "Commissions are welcome:",
+    "languages": "中文◯ / English△ / 日本語△"
+  },
+  "commer": {
+    "title": "Notice of Request",
+    "price": {
+      "title": "Illustrate of the price",
+      "items": [
+        "Cute Version: 500~1000NT",
+        "Head & Chest Image: 1200-2000NT",
+        "Illustration(Above the thigh, without the sole of the foot): 3000-5000NT",
+        "Full Body Portrait: 5000-8000NT"
+      ],
+      "r18": "R18 is fine, but not accept R18-G",
+      "notes": [
+        "Two or more people, the price will be multiplied by the number of the characters.",
+        "If need to design the background will charge additional 300-700NT(Monochrome or white background does not need to increase the price.)",
+        "If need to design the character's costume will charge additional 800NT",
+        "If you dont know the content you want will charge additional 800NT(Which means I need to help you think the content&idea)"
+      ]
+    },
+    "process": {
+      "title": "The Process of Artwork",
+      "diff": "※The difference version is priced according to the requirements!",
+      "revision": "In the second review of the manuscript, that is, when preparing for the final manuscript processing, you can have 1 major change (such as overall action) and 3 minor changes (such as color, some small shapes, etc.). Of course, it would be best to raise it during the draft stage (because it won't use up the number of changes)!",
+      "notes": [
+        "If the time of changes is exceeded, an additional TWD500 will be charged!",
+        "The final price will change according to the content required by the client"
+      ],
+      "contact": "Welcome to ask if you have any questions of request."
+    },
+    "copyright": {
+      "title": "Copyright Statement",
+      "notice": "(The copyright of the above-mentioned works belongs to the author himself)",
+      "designTitle": "Design related:",
+      "buyout": "Buying out for over 10,000 NT",
+      "buyoutDesc": "(Which means purchasing full copyright.)",
+      "nobuyout": "Not buying out for over 5,000 NT",
+      "nobuyoutDesc": "(Which means I own the copyright; no resale, modification by others, or commercial use permitted.)"
+    }
+  },
+    "artworks": {
+    "pageTitle": "作品集",
+    "pageSubtitle": "これまでの作品一覧",
+    "view": "View",
+    "moreButton": "More Artworks",
+    "featuredLabel": "Latest Work",
+    "viewOnPixiv": "View on Pixiv",
+
+    "art_2026_03_29": "ロッシ",
+    "art_2026_03_29_desc": "鷹角的設計很多時候真的會讓我搞不清楚該怎麼去拆解衣服會比較好(·ω·)\n真的很佩服設計師能想出這些造型\n上次伊瑪吃了大保 這次讓我少少出吧~",
+    "art_2026_03_29_bonus_label": "FANBOX",
+    "art_2026_03_29_bonus_text": "差分: 裸 ぶっかけ ↓7p+2p",
+    "art_2026_03_29_bonus_url": "https://kareya.fanbox.cc/posts/11643246",
+
+    "art_2026_03_08": "チャイナドレスのヒナもめちゃくちゃ可愛い！",
+    "art_2025_12_25": "三人の静かなクリスマス",
+    "art_2025_11_01": "お菓子ないなら、「白い魂」ちょうだいっ♡",
+    "art_2025_10_12": "名前のない子",
+    "art_2025_08_29": "やぁ、先生。お陰で今日も「楽しい」一日になりそうだ",
+    "art_2025_08_10": "こんな時はどうすればいいのか、よく分からなくて、ごめん",
+    "art_2025_06_22": "……本当に、夢みたいです……せんせえ……ありがとうございます",
+    "art_2025_04_07": "「本気を出すわよ——燃え尽きても知らないんだからっ！」",
+    "art_2024_10_31": "「先生がいくらお菓子をくれても無駄だよ」",
+    "art_2024_10_19": "「先生、少し暑くはないかの？」",
+    "art_2024_09_27": "「先生、キキを抱っこしてくれませんか？お願い！お願い！」"
+  },
+    "contact": {
+    "title": "Contact",
+      "email": {
+        "title": "✉️ E-mail",
+        "label": "Email Address",
+        "note": "※Ask the details of request or other questions by e-mail!※"
+      },
+      "twitter": {
+        "title": "𝕏 Twitter",
+        "desc": "Get more information of post and media!",
+        "button": "Click me to Twitter!"
+      },
+      "pixiv": {
+        "title": "🅿️ Pixiv",
+        "desc": "Get more information of artworks!",
+        "button": "Click me to Pixiv!"
+    }
+  },
+  "footer": {
+    "copyright": "© 2026 彼夜公式. / RORONEKO All rights reserved."
+  },
+  "stop": {
+    "title": "Under Maintenance",
+    "message": "The site is currently under maintenance.",
+    "subMessage": "Please check back later.",
+    "backSoon": "We'll be back soon"
+  }
+}

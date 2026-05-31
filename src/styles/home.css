@@ -1,0 +1,203 @@
+/* ============================
+   Home Page Wrapper
+   ============================ */
+.home-wrapper {
+  min-height: 100vh;
+  padding-top: 80px;
+  padding-bottom: 0px;
+  animation: fadeIn 0.6s ease-out;
+}
+
+/* ============================
+   Full-width Hero Banner
+   ============================ */
+.hero-banner {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  margin-bottom: 3rem;
+  height: 420px;
+  overflow: hidden;
+}
+
+.hero-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 768px) {
+  .hero-banner {
+    height: 240px;
+    margin-bottom: 2rem;
+  }
+}
+
+
+/* ============================
+   Full-width Hero Card (Main Card)
+   ============================ */
+.hero-card {
+  display: flex;
+  max-width: 1200px;
+  margin: 0 auto 2rem;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.8s ease-out both;
+}
+
+.hero-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.hero-image {
+  flex: 0 0 40%;
+  overflow: hidden;
+  background: #f0f0f0;
+}
+
+.hero-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s ease;
+}
+
+.hero-card:hover .hero-image img {
+  transform: scale(1.05);
+}
+
+.hero-text {
+  flex: 1;
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.hero-text h1 {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  color: #2c3e50;
+  margin: 0;
+  line-height: 1.5;
+  font-weight: 700;
+}
+
+.hero-text p {
+  font-size: clamp(0.95rem, 1.6vw, 1.05rem);
+  color: #555;
+  line-height: 1.8;
+  margin: 0;
+}
+
+.hero-text a {
+  color: #3498db;
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.hero-text a:hover {
+  text-decoration: underline;
+}
+
+/* ============================
+   Social Media Container
+   ============================ */
+.social-container {
+  max-width: 600px;
+  margin: 2rem auto;
+  display: flex;
+  justify-content: center;
+  padding: 0 1rem;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+}
+
+.social-box {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 1.5rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(10px);
+  flex-wrap: wrap;
+}
+
+.social-logo-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+  padding: 0.3rem;
+}
+
+.social-logo-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.social-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+/* ============================
+   Responsive
+   ============================ */
+@media (max-width: 768px) {
+  .home-wrapper {
+    padding-top: 100px;
+    padding-bottom: 0px;
+  }
+
+  .hero-card {
+    flex-direction: column;
+    margin: 0 1rem 2rem;
+  }
+
+  .hero-image {
+    flex: 0 0 250px;
+    height: 250px;
+  }
+
+  .hero-text {
+    padding: 1.5rem;
+    gap: 0.7rem;
+  }
+
+  .social-box {
+    gap: 1rem;
+    padding: 1rem;
+  }
+
+  .social-logo {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-text {
+    padding: 1rem;
+  }
+
+  .social-logo {
+    width: 30px;
+    height: 30px;
+  }
+}

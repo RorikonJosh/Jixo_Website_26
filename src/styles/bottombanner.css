@@ -1,0 +1,52 @@
+/* ================================================
+   Bottom Banner
+   ================================================ */
+.bottom-banner {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  margin-top: 80px;
+  background: transparent;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.bottom-banner::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/images/jixo_bottombanner.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.5) 20%,
+    rgba(0, 0, 0, 0.9) 35%,
+    #000 50%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.5) 20%,
+    rgba(0, 0, 0, 0.9) 35%,
+    #000 50%
+  );
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+  .bottom-banner {
+    height: 260px;
+    margin-top: 3rem;
+  }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+  .bottom-banner {
+    height: 180px;
+  }
+}
