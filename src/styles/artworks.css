@@ -113,6 +113,38 @@ body.artworks-bg {
   margin: 0.5rem 0 0;
 }
 
+.featured-bonus {
+  margin-top: 0.25rem;
+}
+
+.bonus-line {
+  margin: 0;
+  line-height: 1.7;
+  font-size: 0.95rem;
+  color: #2d2d5a;
+}
+
+.bonus-tag {
+  font-weight: 700;
+}
+
+.bonus-text {
+  margin-left: 0.15rem;
+}
+
+.bonus-link {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.9rem;
+  color: #3498db;
+  word-break: break-all;
+  text-decoration: none;
+}
+
+.bonus-link:hover {
+  text-decoration: underline;
+}
+
 .featured-actions {
   display: flex;
   gap: 1rem;

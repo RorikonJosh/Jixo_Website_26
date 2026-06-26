@@ -9,14 +9,28 @@
   padding: 1rem 2rem;
   background-color: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   z-index: 9999;
-  transition: all 0.3s ease;
+  transition:
+    padding 0.35s ease,
+    background-color 1.6s ease,
+    border-color 1.6s ease,
+    box-shadow 0.35s ease;
 }
 
 .header.scrolled {
+  padding: 0.5rem 1.5rem;
   background-color: rgba(255, 255, 255, 0.98);
   box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08);
+}
+
+.header.scrolled .logo-img {
+  height: 52px;
+}
+
+.header.scrolled .nav-btn {
+  font-size: 1.05rem;
 }
 
 .nav-container {
@@ -46,7 +60,10 @@
   width: auto;
   max-width: 100px;
   object-fit: contain;
-  transition: all 0.3s ease;
+  transition:
+    height 0.35s ease,
+    filter 1.6s ease,
+    transform 0.3s ease;
 }
 
 /* ============================
@@ -64,7 +81,7 @@
   text-decoration: none;
   font-weight: 500;
   position: relative;
-  transition: color 0.3s ease;
+  transition: color 1.6s ease, font-size 0.35s ease;
   font-size: 1.25rem;
 }
 
@@ -76,7 +93,7 @@
   width: 0;
   height: 2px;
   background-color: #3498db;
-  transition: width 0.3s ease;
+  transition: width 0.3s ease, background-color 1.6s ease;
 }
 
 .nav-btn:hover,
@@ -107,7 +124,7 @@
   height: 2px;
   background: #333;
   margin: 3px 0;
-  transition: all 0.3s ease;
+  transition: background-color 1.6s ease, transform 0.3s ease, opacity 0.3s ease;
   border-radius: 2px;
 }
 
@@ -142,7 +159,11 @@
   border-radius: 6px;
   cursor: pointer;
   min-width: 140px;
-  transition: all 0.3s ease;
+  transition:
+    background-color 1.6s ease,
+    border-color 1.6s ease,
+    color 1.6s ease,
+    box-shadow 0.3s ease;
 }
 
 .selected-language:hover {
@@ -158,6 +179,7 @@
 .selected-text {
   flex: 1;
   font-size: 0.9rem;
+  transition: color 1.6s ease;
 }
 
 .dropdown-arrow {
@@ -182,6 +204,10 @@
   margin-top: 2px;
   animation: fadeInUp 0.2s ease;
   overflow: hidden;
+  transition:
+    background-color 1.6s ease,
+    border-color 1.6s ease,
+    box-shadow 0.3s ease;
 }
 
 .language-option {
@@ -191,7 +217,9 @@
   cursor: pointer;
   color: #333;
   text-decoration: none;
-  transition: background-color 0.2s ease;
+  transition:
+    background-color 1.6s ease,
+    color 1.6s ease;
   border: none;
   background: none;
   width: 100%;
@@ -215,6 +243,7 @@
   font-weight: bold;
   visibility: hidden;
   margin-left: auto;
+  transition: color 1.6s ease;
 }
 
 .language-option.current .check-mark {
@@ -224,6 +253,116 @@
 .language-info {
   display: flex;
   align-items: center;
+}
+
+/* ============================
+   Commissions Page — Theme General (soft blue)
+   ============================ */
+body.commissions-active.theme-general .header {
+  background-color: rgba(240, 247, 255, 0.92);
+  border-bottom-color: rgba(184, 212, 238, 0.6);
+}
+
+body.commissions-active.theme-general .header.scrolled {
+  background-color: rgba(240, 247, 255, 0.97);
+  box-shadow: 0 2px 20px rgba(91, 155, 213, 0.15);
+}
+
+body.commissions-active.theme-general .nav-btn {
+  color: #5a6a7a;
+}
+
+body.commissions-active.theme-general .nav-btn:hover,
+body.commissions-active.theme-general .nav-btn.active {
+  color: #2c5282;
+}
+
+body.commissions-active.theme-general .nav-btn::after {
+  background-color: #5b9bd5;
+}
+
+body.commissions-active.theme-general .selected-language {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(184, 212, 238, 0.8);
+}
+
+body.commissions-active.theme-general .selected-language:hover {
+  border-color: #5b9bd5;
+}
+
+body.commissions-active.theme-general .selected-text {
+  color: #2c5282;
+}
+
+/* ============================
+   Commissions Page — Theme R18 (dark wine)
+   ============================ */
+body.commissions-active.theme-r18 .header {
+  background-color: rgba(32, 18, 28, 0.92);
+  border-bottom-color: rgba(74, 40, 64, 0.7);
+}
+
+body.commissions-active.theme-r18 .header.scrolled {
+  background-color: rgba(32, 18, 28, 0.97);
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+body.commissions-active.theme-r18 .logo-img {
+  filter: brightness(0) invert(1);
+}
+
+body.commissions-active.theme-r18 .nav-btn {
+  color: #d4b8c4;
+}
+
+body.commissions-active.theme-r18 .nav-btn:hover,
+body.commissions-active.theme-r18 .nav-btn.active {
+  color: #f0dce4;
+}
+
+body.commissions-active.theme-r18 .nav-btn::after {
+  background-color: #9b4d6a;
+}
+
+body.commissions-active.theme-r18 .mobile-toggle span {
+  background: #d4b8c4;
+}
+
+body.commissions-active.theme-r18 .selected-language {
+  background-color: rgba(48, 28, 40, 0.9);
+  border-color: rgba(74, 40, 64, 0.8);
+  color: #d4b8c4;
+}
+
+body.commissions-active.theme-r18 .selected-language:hover {
+  border-color: #9b4d6a;
+}
+
+body.commissions-active.theme-r18 .selected-text {
+  color: #d4b8c4;
+}
+
+body.commissions-active.theme-r18 .language-dropdown-menu {
+  background-color: #2a1824;
+  border-color: rgba(74, 40, 64, 0.8);
+}
+
+body.commissions-active.theme-r18 .language-option {
+  color: #d4b8c4;
+}
+
+body.commissions-active.theme-r18 .language-option:hover {
+  background-color: rgba(74, 40, 64, 0.4);
+  color: #f0dce4;
+}
+
+body.commissions-active.theme-r18 .language-option.current {
+  background-color: rgba(155, 77, 106, 0.25);
+  color: #f0dce4;
+}
+
+body.commissions-active.theme-r18 .check-mark {
+  color: #9b4d6a;
 }
 
 /* ============================
@@ -253,7 +392,7 @@
     width: 250px;
     height: calc(100vh - 80px);
     padding: 2rem 1rem;
-    transition: right 0.3s ease;
+    transition: top 0.35s ease, right 0.3s ease, background-color 1.6s ease;
     box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
     gap: 1rem;
     z-index: 9998;
@@ -262,6 +401,23 @@
 
   .nav-buttons.active {
     right: 0;
+  }
+
+  .header.scrolled .nav-buttons {
+    top: 60px;
+    height: calc(100vh - 60px);
+  }
+
+  body.commissions-active.theme-general .nav-buttons {
+    background-color: rgba(240, 247, 255, 0.98);
+  }
+
+  body.commissions-active.theme-r18 .nav-buttons {
+    background-color: rgba(32, 18, 28, 0.98);
+  }
+
+  body.commissions-active.theme-r18 .nav-buttons .nav-btn {
+    border-bottom-color: rgba(74, 40, 64, 0.4);
   }
 
   .nav-buttons .nav-btn {

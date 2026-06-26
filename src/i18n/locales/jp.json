@@ -3,6 +3,7 @@
     "home": "ホーム",
     "artworks": "作品集",
     "request": "リクエスト",
+    "commissions": "依頼作品集",
     "contact": "連絡"
   },
   "home": {
@@ -75,6 +76,41 @@
     "art_2024_10_31": "「先生がいくらお菓子をくれても無駄だよ」",
     "art_2024_10_19": "「先生、少し暑くはないかの？」",
     "art_2024_09_27": "「先生、キキを抱っこしてくれませんか？お願い！お願い！」"
+  },
+  "commissions": {
+    "pageTitle": "依頼作品集",
+    "pageSubtitle": "これまでの委託作品一覧",
+    "featuredLabel": "最新の依頼",
+    "moreWorks": "その他の委託作品",
+    "tabGeneral": "全年齢",
+    "tabR18": "R18",
+    "clientLabel": "依頼者",
+    "view": "詳細を見る",
+    "viewOnPixiv": "Pixiv で見る",
+    "lightboxClose": "閉じる",
+    "ageGate": {
+      "title": "年齢確認",
+      "message": "このコンテンツは18歳以上の方のみ閲覧できます。あなたは18歳以上ですか？",
+      "confirm": "18歳以上です",
+      "cancel": "戻る"
+    },
+    "comm_004_title": "あら～遅いじゃない❤ タイヤ暖めてるの？優しいんだね～♡",
+    "comm_004_desc": "感謝 安弟 的委託\n以前就很喜歡這隻了 過了這麼久能畫得更好了\n這張RQ精靈小鬼的想法我真的覺得超讚 各處細節都很認真地畫了\n跟上次一樣 我要求了讓我多畫點差分:D",
+    "comm_004_bonus_label": "FANBOX",
+    "comm_004_bonus_text": "差分:溢れ精液 下脱ぎ  ※ 放尿 注意!↓8p+2p",
+    "comm_004_bonus_url": "https://kareya.fanbox.cc/posts/10785924",
+    "comm_005_title": "2025.08.23",
+    "comm_005_desc": "",
+    "comm_r18_004_title": "今日は退屈ね~",
+    "comm_r18_004_desc": "感謝 馬鈴薯 的委託\n很認真地畫了這次的委託\n加了很多感覺有趣的生活小物品\n模仿了些畫比較成熟角色的繪師畫風 感覺比較適合\n顏色的感覺很好 又進步了點個感覺\n地上的是掃地機器米娘獸 之前也有很多不同型態的米娘獸 大家可以找看看",
+    "comm_r18_004_bonus_label": "FANBOX",
+    "comm_r18_004_bonus_text": "差分:裸  衣装変更↓6p",
+    "comm_r18_004_bonus_url": "https://kareya.fanbox.cc/posts/10947258",
+    "comm_r18_003_title": "シャンプーいたずら",
+    "comm_r18_003_desc": "感謝 josh 的委託。沒想到會有回頭客，當下接到時超開心的。而且還是這麼讚的主題，所以就畫了一堆差分。我也認為是時候了…",
+    "comm_r18_003_bonus_label": "FANBOX、fantia 同步",
+    "comm_r18_003_bonus_text": "※ふたなり注意!↓",
+    "comm_r18_003_bonus_url": "https://kareya.fanbox.cc/posts/10279616"
   },
     "contact": {
     "title": "連絡",

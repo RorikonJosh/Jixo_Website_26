@@ -1,21 +1,25 @@
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 
 export default function Navbar() {
   const { t, i18n } = useTranslation();
+  const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [location.pathname]);
 
   const languages = [
-    { code: 'ja', label: '日本語' },
+    { code: 'jp', label: '日本語' },
     { code: 'zh', label: '繁體中文' },
     { code: 'en', label: 'English' },
   ];
@@ -44,6 +48,9 @@ export default function Navbar() {
           </NavLink>
           <NavLink to="/commer" className="nav-btn" onClick={() => setMenuOpen(false)}>
             {t('nav.request')}
+          </NavLink>
+          <NavLink to="/commissions" className="nav-btn" onClick={() => setMenuOpen(false)}>
+            {t('nav.commissions')}
           </NavLink>
           <NavLink to="/contact" className="nav-btn" onClick={() => setMenuOpen(false)}>
             {t('nav.contact')}

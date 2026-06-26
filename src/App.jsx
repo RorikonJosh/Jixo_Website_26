@@ -7,6 +7,7 @@ import BackToTop from './components/BackToTop';
 import Home from './pages/Home';
 import Artworks from './pages/Artworks';
 import Commer from './pages/Commer';
+import Commissions from './pages/Commissions';
 import Contact from './pages/Contact';
 import Stop from './pages/Stop';
 import './i18n';
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/artworks" element={<Artworks />} />
         <Route path="/commer" element={<Commer />} />
+        <Route path="/commissions" element={<Commissions />} />
         <Route path="/contact" element={<Contact />} />
       </Routes>
       <BottomBanner />
