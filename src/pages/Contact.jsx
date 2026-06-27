@@ -44,7 +44,7 @@ export default function Contact() {
               <h3>{t('contact.twitter.title')}</h3>
               <p>{t('contact.twitter.desc')}</p>
               <a
-                href="https://twitter.com/your_account"
+                href="https://x.com/jixo95821699"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-btn"
@@ -60,7 +60,7 @@ export default function Contact() {
               <h3>{t('contact.pixiv.title')}</h3>
               <p>{t('contact.pixiv.desc')}</p>
               <a
-                href="https://www.pixiv.net/users/your_id"
+                href="https://www.pixiv.net/users/31690832"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="contact-btn"
