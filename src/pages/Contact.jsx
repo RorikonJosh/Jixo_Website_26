@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import CommissionRequestForm from '../components/CommissionRequestForm';
 import '../styles/contact.css';
 
 export default function Contact() {
@@ -35,6 +36,7 @@ export default function Contact() {
                 </a>
               </p>
               <p className="note">{t('contact.email.note')}</p>
+              <CommissionRequestForm />
             </div>
 
             <hr />
@@ -71,9 +73,6 @@ export default function Contact() {
           </div>
         </div>
       </section>
-
-      {/* ===== Footer Copyright ===== */}
-      <div className="copyright">{t('footer.copyright')}</div>
     </>
   );
 }

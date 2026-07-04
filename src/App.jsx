@@ -1,35 +1,44 @@
-import { Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import BottomBanner from './components/BottomBanner';
 import ScrollToTop from './components/ScrollToTop';
-import BackToTop from './components/BackToTop'; 
+import BackToTop from './components/BackToTop';
 import Home from './pages/Home';
 import Artworks from './pages/Artworks';
 import Commer from './pages/Commer';
 import Commissions from './pages/Commissions';
 import Contact from './pages/Contact';
 import Stop from './pages/Stop';
+import Admin from './pages/Admin';
+import { fetchPublicMaintenance } from './lib/adminApi';
 import './i18n';
-import './styles/backtotop.css'; 
+import './styles/backtotop.css';
 
-// 🚧 maintain on or off?
-const isMaintenance = import.meta.env.VITE_MAINTENANCE === 'true';
+function isAdminPath(pathname) {
+  const normalized = pathname.replace(/\/+$/, '') || '/';
+  return normalized === '/admin' || normalized.endsWith('/admin');
+}
 
-export default function App() {
-  // maintain mode on
-  if (isMaintenance) {
-    return (
-      <Routes>
-        <Route path="*" element={<Stop />} />
-      </Routes>
-    );
-  }
-
-  // maintain mode off
+function AdminRoutes() {
   return (
     <>
-      <ScrollToTop />  
+      <ScrollToTop />
+      <Routes>
+        <Route path="/admin/*" element={<Admin />} />
+      </Routes>
+      <BottomBanner />
+      <Footer />
+      <BackToTop />
+    </>
+  );
+}
+
+function SiteRoutes() {
+  return (
+    <>
+      <ScrollToTop />
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -42,5 +51,65 @@ export default function App() {
       <Footer />
       <BackToTop />
     </>
+  );
+}
+
+export default function App() {
+  const location = useLocation();
+  const adminPath = isAdminPath(location.pathname);
+  const envMaintenance = import.meta.env.VITE_MAINTENANCE === 'true';
+  const [maintenance, setMaintenance] = useState(envMaintenance);
+  const [ready, setReady] = useState(adminPath || !envMaintenance);
+
+  useEffect(() => {
+    if (adminPath) {
+      setReady(true);
+      return;
+    }
+
+    let active = true;
+
+    async function loadMaintenance() {
+      if (envMaintenance) {
+        if (active) {
+          setMaintenance(true);
+          setReady(true);
+        }
+        return;
+      }
+
+      const enabled = await fetchPublicMaintenance();
+      if (active) {
+        setMaintenance(enabled);
+        setReady(true);
+      }
+    }
+
+    loadMaintenance();
+    return () => {
+      active = false;
+    };
+  }, [adminPath, envMaintenance, location.pathname]);
+
+  if (adminPath) {
+    return <AdminRoutes />;
+  }
+
+  if (!ready) {
+    return null;
+  }
+
+  if (maintenance) {
+    return (
+      <Routes>
+        <Route path="*" element={<Stop />} />
+      </Routes>
+    );
+  }
+
+  return (
+    <Routes>
+      <Route path="*" element={<SiteRoutes />} />
+    </Routes>
   );
 }

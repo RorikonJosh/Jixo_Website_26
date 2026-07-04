@@ -1,0 +1,289 @@
+.commission-form-block {
+  margin-top: 1rem;
+}
+
+.commission-form-toggle,
+.commission-form-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.85rem 1.8rem;
+  border: none;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #1a1a4d 0%, #3a3a8a 100%);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(26, 26, 77, 0.25);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.commission-form-toggle:hover,
+.commission-form-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(26, 26, 77, 0.35);
+}
+
+.commission-form-submit:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* ===== Modal overlay ===== */
+.commission-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10001;
+  background: rgba(26, 26, 77, 0.5);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 1.5rem;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.commission-modal {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(820px, 100%);
+  max-height: calc(100dvh - 3rem);
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  border-radius: 20px;
+  box-shadow: 0 28px 70px rgba(26, 26, 77, 0.35);
+  animation: fadeInUp 0.35s ease-out;
+  overflow: hidden;
+}
+
+.commission-modal-toolbar {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.85rem 0.95rem 0;
+}
+
+.commission-modal-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0 1.75rem 1.5rem;
+  scrollbar-gutter: stable;
+}
+
+.commission-modal-close {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(26, 26, 77, 0.1);
+  color: #1a1a4d;
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.commission-modal-close:hover:not(:disabled) {
+  background: rgba(26, 26, 77, 0.18);
+  transform: scale(1.05);
+}
+
+.commission-modal-close:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.commission-modal-success {
+  padding-top: 0.25rem;
+}
+
+.commission-modal-success h3 {
+  margin: 0 0 1rem;
+  font-size: 1.35rem;
+  color: #1a1a4d;
+}
+
+.commission-form {
+  padding: 0;
+  background: transparent;
+  border: none;
+}
+
+.commission-form-header h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.35rem;
+  color: #1a1a4d;
+}
+
+.commission-form-note,
+.commission-form-hint {
+  margin: 0;
+  color: #666;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.commission-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.commission-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.92rem;
+  color: #2c3e50;
+}
+
+.commission-field--full {
+  grid-column: 1 / -1;
+}
+
+.commission-field span,
+.commission-field-label {
+  font-weight: 600;
+}
+
+.commission-field-label {
+  display: block;
+  margin-bottom: 0.4rem;
+}
+
+.commission-field input[type='text'],
+.commission-field input[type='email'],
+.commission-field input[type='date'],
+.commission-field textarea,
+.commission-field input[type='file'] {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid rgba(26, 26, 77, 0.15);
+  border-radius: 10px;
+  font: inherit;
+  background: #fff;
+  color: #333;
+  box-sizing: border-box;
+}
+
+.commission-field textarea {
+  resize: vertical;
+  min-height: 88px;
+  max-height: 220px;
+}
+
+.commission-field input:focus,
+.commission-field textarea:focus {
+  outline: 2px solid rgba(91, 155, 213, 0.45);
+  border-color: #5b9bd5;
+}
+
+.commission-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.commission-radio,
+.commission-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 500;
+}
+
+.commission-file-list {
+  margin: 0.35rem 0 0;
+  padding-left: 1.1rem;
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.commission-honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.commission-form-message {
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.92rem;
+}
+
+.commission-form-message--success {
+  background: rgba(76, 175, 80, 0.12);
+  color: #2e7d32;
+  border: 1px solid rgba(76, 175, 80, 0.25);
+}
+
+.commission-form-message--error {
+  background: rgba(211, 47, 47, 0.1);
+  color: #c62828;
+  border: 1px solid rgba(211, 47, 47, 0.2);
+}
+
+.commission-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.commission-form-cancel {
+  padding: 0.75rem 1.4rem;
+  border: 1px solid rgba(26, 26, 77, 0.2);
+  border-radius: 50px;
+  background: transparent;
+  color: #555;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.commission-form-cancel:hover:not(:disabled) {
+  background: rgba(26, 26, 77, 0.05);
+}
+
+@media (max-width: 768px) {
+  .commission-modal-overlay {
+    padding: 0;
+  }
+
+  .commission-modal {
+    width: 100%;
+    max-height: 100dvh;
+    height: 100dvh;
+    border-radius: 0;
+  }
+
+  .commission-modal-scroll {
+    padding: 0 1.1rem 1.25rem;
+  }
+
+  .commission-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .commission-form-actions {
+    flex-direction: column-reverse;
+  }
+
+  .commission-form-toggle,
+  .commission-form-submit,
+  .commission-form-cancel {
+    width: 100%;
+  }
+}

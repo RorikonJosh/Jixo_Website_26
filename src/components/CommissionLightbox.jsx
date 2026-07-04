@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { resolveCommissionTexts } from '../lib/portfolio';
 
 export default function CommissionLightbox({ commission, isR18, onClose }) {
-  const { t } = useTranslation();
-
+  const { t, i18n } = useTranslation();
   const [portrait, setPortrait] = useState(false);
 
   useEffect(() => {
@@ -24,11 +24,15 @@ export default function CommissionLightbox({ commission, isR18, onClose }) {
 
   if (!commission?.fullsizeImage) return null;
 
-  const title = t(`commissions.${commission.titleKey}`);
-  const desc = t(`commissions.${commission.descKey}`);
-  const client = commission.clientKey
-    ? t(`commissions.${commission.clientKey}`)
-    : null;
+  const {
+    title,
+    desc,
+    client,
+    hasBonus,
+    bonusLabel,
+    bonusText,
+    bonusUrl,
+  } = resolveCommissionTexts(commission, t, i18n.language);
 
   return (
     <div
@@ -73,24 +77,24 @@ export default function CommissionLightbox({ commission, isR18, onClose }) {
           )}
           <p className="commission-lightbox-desc">{desc}</p>
 
-          {commission.bonusKey && (
+          {hasBonus && (
             <div className="featured-bonus commission-lightbox-bonus">
               <p className="bonus-line">
-                <span className="bonus-tag">
-                  【{t(`commissions.${commission.bonusKey}_bonus_label`)}】
-                </span>
-                <span className="bonus-text">
-                  {t(`commissions.${commission.bonusKey}_bonus_text`)}
-                </span>
+                {bonusLabel && (
+                  <span className="bonus-tag">【{bonusLabel}】</span>
+                )}
+                <span className="bonus-text">{bonusText}</span>
               </p>
-              <a
-                href={t(`commissions.${commission.bonusKey}_bonus_url`)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bonus-link"
-              >
-                fanbox:{t(`commissions.${commission.bonusKey}_bonus_url`)}
-              </a>
+              {bonusUrl && (
+                <a
+                  href={bonusUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bonus-link"
+                >
+                  fanbox:{bonusUrl}
+                </a>
+              )}
             </div>
           )}
 

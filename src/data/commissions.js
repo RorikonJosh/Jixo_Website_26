@@ -1,19 +1,12 @@
-import commGeneral20251024 from '../assets/commissions/general/20251024.jpg';
-import commGeneral20251024Full from '../assets/commissions/general/fullsize/20251024_FULL.jpg';
-import commGeneral20250823 from '../assets/commissions/general/20250823.png';
-import commGeneral20250823Full from '../assets/commissions/general/fullsize/20250823_FULL.png';
-import commR18_20251123 from '../assets/commissions/r18/20251123.jpg';
-import commR18_20251123Full from '../assets/commissions/r18/fullsize/20251123_FULL.jpg';
-import commR18_20250725 from '../assets/commissions/r18/20250725.jpg';
-import commR18_20250725Full from '../assets/commissions/r18/fullsize/20250725_FULL.jpg';
+import { buildCommissions } from '../lib/portfolioStorage';
 
-export const commissions = [
+const commissionsRaw = [
   {
     id: 1,
     category: 'general',
     date: '2025.10.24',
-    image: commGeneral20251024,
-    fullsizeImage: commGeneral20251024Full,
+    imagePath: 'commissions/general/20251024.jpg',
+    fullsizePath: 'commissions/general/fullsize/20251024_FULL.jpg',
     titleKey: 'comm_004_title',
     descKey: 'comm_004_desc',
     bonusKey: 'comm_004',
@@ -23,8 +16,8 @@ export const commissions = [
     id: 2,
     category: 'general',
     date: '2025.08.23',
-    image: commGeneral20250823,
-    fullsizeImage: commGeneral20250823Full,
+    imagePath: 'commissions/general/20250823.png',
+    fullsizePath: 'commissions/general/fullsize/20250823_FULL.png',
     titleKey: 'comm_005_title',
     descKey: 'comm_005_desc',
     link: '#',
@@ -33,8 +26,8 @@ export const commissions = [
     id: 3,
     category: 'r18',
     date: '2025.11.23',
-    image: commR18_20251123,
-    fullsizeImage: commR18_20251123Full,
+    imagePath: 'commissions/r18/20251123.jpg',
+    fullsizePath: 'commissions/r18/fullsize/20251123_FULL.jpg',
     titleKey: 'comm_r18_004_title',
     descKey: 'comm_r18_004_desc',
     bonusKey: 'comm_r18_004',
@@ -44,8 +37,8 @@ export const commissions = [
     id: 4,
     category: 'r18',
     date: '2025.07.25',
-    image: commR18_20250725,
-    fullsizeImage: commR18_20250725Full,
+    imagePath: 'commissions/r18/20250725.jpg',
+    fullsizePath: 'commissions/r18/fullsize/20250725_FULL.jpg',
     titleKey: 'comm_r18_003_title',
     descKey: 'comm_r18_003_desc',
     bonusKey: 'comm_r18_003',
@@ -53,16 +46,8 @@ export const commissions = [
   },
 ];
 
-const sortByDateDesc = (items) =>
-  [...items].sort((a, b) => {
-    const dateA = new Date(a.date.replace(/\./g, '-'));
-    const dateB = new Date(b.date.replace(/\./g, '-'));
-    return dateB - dateA;
-  });
+const built = buildCommissions(commissionsRaw);
 
-export const generalCommissions = sortByDateDesc(
-  commissions.filter((c) => c.category === 'general'),
-);
-export const r18Commissions = sortByDateDesc(
-  commissions.filter((c) => c.category === 'r18'),
-);
+export const commissions = built.commissions;
+export const generalCommissions = built.generalCommissions;
+export const r18Commissions = built.r18Commissions;

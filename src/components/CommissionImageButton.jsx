@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { resolveCommissionTexts } from '../lib/portfolio';
 
 function isPortraitImage(img) {
   return img.naturalHeight > img.naturalWidth;
@@ -12,9 +13,9 @@ export default function CommissionImageButton({
   imgClassName = 'artwork-image',
   loading,
 }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [portrait, setPortrait] = useState(false);
-  const title = t(`commissions.${commission.titleKey}`);
+  const { title } = resolveCommissionTexts(commission, t, i18n.language);
   const canOpen = Boolean(commission.fullsizeImage && onOpen);
 
   const handleImageLoad = (e) => {

@@ -5,10 +5,7 @@ import './i18n';
 import './styles/global.css';
 import './styles/header.css';
 import './styles/footer.css';
-import './styles/home.css';
 import './styles/brand.css';
-import './styles/pagelayout.css';
-import './styles/artworks.css';
 import App from './App.jsx';
 
 createRoot(document.getElementById('root')).render(

@@ -1,12 +1,5 @@
 /* ===== Contact Page ===== */
 
-.contact-page-wrapper .brand-card {
-  max-width: 1400px;
-  width: 95%;
-  margin: 0 auto;
-}
-
-/* Block separation */
 .contact-section {
   margin-bottom: 1.2rem;
 }

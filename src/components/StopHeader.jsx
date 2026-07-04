@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink } from 'react-router-dom';
-import '../styles/header.css';
 
 export default function MiniHeader() {
   const { i18n } = useTranslation();

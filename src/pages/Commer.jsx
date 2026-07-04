@@ -20,7 +20,7 @@ export default function Commer() {
   return (
     <>
       {/* ===== Brand Introduction ===== */}
-      <section className="brand-introduction">
+      <section className="brand-introduction wide commer-page">
         <div className="brand-card">
           {/* Left image */}
           <div className="brand-image">
@@ -81,9 +81,6 @@ export default function Commer() {
           </div>
         </div>
       </section>
-
-      {/* ===== Footer Copyright ===== */}
-      <div className="copyright">{t('footer.copyright')}</div>
     </>
   );
 }

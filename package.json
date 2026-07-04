@@ -7,9 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "verify:admin": "node scripts/verify-admin-setup.mjs",
+    "upload:portfolio": "node scripts/upload-portfolio.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.110.0",
     "i18next": "^26.3.0",
     "i18next-browser-languagedetector": "^8.2.1",
     "react": "^19.2.6",
@@ -30,7 +33,9 @@
     "vite": "^8.0.12"
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
-

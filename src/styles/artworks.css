@@ -1,8 +1,3 @@
-/* ===== background ===== */
-body.artworks-bg {
-  background-color: #dde3ec;
-}
-
 /* ===== container ===== */
 .artworks-page {
   max-width: 1300px;
@@ -351,23 +346,6 @@ body.artworks-bg {
   font-weight: 700;
 }
 
-/* ===== animations ===== */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
 /* ===== more artworks button ===== */
 .more-artworks-wrap {
   display: flex;
@@ -505,9 +483,6 @@ body.artworks-bg {
   .featured-title {
     font-size: 1.2rem;
   }
-}
-
-@media (max-width: 500px) {
   .more-artworks-btn {
     padding: 0.9rem 2rem;
     font-size: 0.9rem;

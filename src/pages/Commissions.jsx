@@ -4,16 +4,19 @@ import CommissionCard from '../components/CommissionCard';
 import CommissionImageButton from '../components/CommissionImageButton';
 import CommissionLightbox from '../components/CommissionLightbox';
 import AgeGateModal from '../components/AgeGateModal';
-import { generalCommissions, r18Commissions } from '../data/commissions';
+import { fetchCommissionsForPage, resolveCommissionTexts } from '../lib/portfolio';
 import { isR18AgeConfirmed, setR18AgeConfirmed } from '../utils/r18AgeGate';
 import '../styles/artworks.css';
 import '../styles/commissions.css';
 
 export default function Commissions() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('general');
   const [showAgeGate, setShowAgeGate] = useState(false);
   const [lightboxCommission, setLightboxCommission] = useState(null);
+  const [generalCommissions, setGeneralCommissions] = useState([]);
+  const [r18Commissions, setR18Commissions] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     document.body.classList.add('com-bg', 'commissions-active', 'theme-general');
@@ -24,6 +27,20 @@ export default function Commissions() {
         'theme-general',
         'theme-r18',
       );
+    };
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    fetchCommissionsForPage().then(({ generalCommissions: general, r18Commissions: r18 }) => {
+      if (active) {
+        setGeneralCommissions(general);
+        setR18Commissions(r18);
+        setLoading(false);
+      }
+    });
+    return () => {
+      active = false;
     };
   }, []);
 
@@ -63,6 +80,9 @@ export default function Commissions() {
     activeTab === 'r18' ? r18Commissions : generalCommissions;
   const featured = visibleCommissions[0];
   const others = visibleCommissions.slice(1);
+  const featuredText = featured
+    ? resolveCommissionTexts(featured, t, i18n.language)
+    : null;
 
   return (
     <main className={`commissions-page ${activeTab === 'r18' ? 'commissions-page--r18' : ''}`}>
@@ -97,7 +117,13 @@ export default function Commissions() {
         </div>
       </header>
 
-      {featured && (
+      {loading && (
+        <p className="admin-note" style={{ padding: '4rem 2rem', textAlign: 'center' }}>
+          {t('commissions.loading', '載入中…')}
+        </p>
+      )}
+
+      {!loading && featured && featuredText && (
         <section className="featured-artwork commissions-featured">
           <div className="featured-image">
             <CommissionImageButton
@@ -111,37 +137,33 @@ export default function Commissions() {
             <span className="featured-label">
               ✨ {t('commissions.featuredLabel')}
             </span>
-            <h2 className="featured-title">
-              {t(`commissions.${featured.titleKey}`)}
-            </h2>
+            <h2 className="featured-title">{featuredText.title}</h2>
             <p className="featured-date">{featured.date}</p>
-            {featured.clientKey && (
+            {featuredText.client && (
               <p className="commission-featured-client">
-                {t('commissions.clientLabel')}: {t(`commissions.${featured.clientKey}`)}
+                {t('commissions.clientLabel')}: {featuredText.client}
               </p>
             )}
-            <p className="featured-desc">
-              {t(`commissions.${featured.descKey}`)}
-            </p>
+            <p className="featured-desc">{featuredText.desc}</p>
 
-            {featured.bonusKey && (
+            {featuredText.hasBonus && (
               <div className="featured-bonus">
                 <p className="bonus-line">
-                  <span className="bonus-tag">
-                    【{t(`commissions.${featured.bonusKey}_bonus_label`)}】
-                  </span>
-                  <span className="bonus-text">
-                    {t(`commissions.${featured.bonusKey}_bonus_text`)}
-                  </span>
+                  {featuredText.bonusLabel && (
+                    <span className="bonus-tag">【{featuredText.bonusLabel}】</span>
+                  )}
+                  <span className="bonus-text">{featuredText.bonusText}</span>
                 </p>
-                <a
-                  href={t(`commissions.${featured.bonusKey}_bonus_url`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bonus-link"
-                >
-                  fanbox:{t(`commissions.${featured.bonusKey}_bonus_url`)}
-                </a>
+                {featuredText.bonusUrl && (
+                  <a
+                    href={featuredText.bonusUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bonus-link"
+                  >
+                    fanbox:{featuredText.bonusUrl}
+                  </a>
+                )}
               </div>
             )}
 
@@ -161,7 +183,7 @@ export default function Commissions() {
         </section>
       )}
 
-      {others.length > 0 && (
+      {!loading && others.length > 0 && (
         <>
           <div className="commissions-section-divider">
             <span className="commissions-section-label">

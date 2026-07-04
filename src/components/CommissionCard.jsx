@@ -1,13 +1,10 @@
 import { useTranslation } from 'react-i18next';
 import CommissionImageButton from './CommissionImageButton';
+import { resolveCommissionTexts } from '../lib/portfolio';
 
 export default function CommissionCard({ commission, onOpenLightbox }) {
-  const { t } = useTranslation();
-  const title = t(`commissions.${commission.titleKey}`);
-  const desc = t(`commissions.${commission.descKey}`);
-  const client = commission.clientKey
-    ? t(`commissions.${commission.clientKey}`)
-    : null;
+  const { t, i18n } = useTranslation();
+  const { title, desc, client } = resolveCommissionTexts(commission, t, i18n.language);
 
   return (
     <article className="artwork-card commission-card">
@@ -22,7 +19,7 @@ export default function CommissionCard({ commission, onOpenLightbox }) {
         <div className="artwork-info commission-info">
           <div className="artwork-meta">
             <span className="artwork-date">{commission.date}</span>
-            {commission.clientKey && (
+            {client && (
               <>
                 <span className="artwork-divider">|</span>
                 <span className="commission-client-label">

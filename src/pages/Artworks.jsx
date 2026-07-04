@@ -1,11 +1,13 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ArtworkCard from '../components/ArtworkCard';
-import { artworks } from '../data/artworks';
+import { fetchArtworksForPage, resolveArtworkTexts } from '../lib/portfolio';
 import '../styles/artworks.css';
 
 export default function Artworks() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
+  const [artworks, setArtworks] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     document.body.classList.add('com-bg');
@@ -14,8 +16,41 @@ export default function Artworks() {
     };
   }, []);
 
-  // First artwork is featured, the rest are split into two rows for the marquee
+  useEffect(() => {
+    let active = true;
+    fetchArtworksForPage().then((rows) => {
+      if (active) {
+        setArtworks(rows);
+        setLoading(false);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <main className="artworks-page">
+        <p className="admin-note" style={{ padding: '8rem 2rem', textAlign: 'center' }}>
+          {t('artworks.loading', '載入中…')}
+        </p>
+      </main>
+    );
+  }
+
+  if (artworks.length === 0) {
+    return (
+      <main className="artworks-page">
+        <p className="admin-note" style={{ padding: '8rem 2rem', textAlign: 'center' }}>
+          {t('artworks.empty', '尚無作品')}
+        </p>
+      </main>
+    );
+  }
+
   const featured = artworks[0];
+  const featuredText = resolveArtworkTexts(featured, t, i18n.language);
   const others = artworks.slice(1);
   const half = Math.ceil(others.length / 2);
   const row1 = others.slice(0, half);
@@ -23,7 +58,6 @@ export default function Artworks() {
 
   return (
     <main className="artworks-page">
-      {/* Featured Artwork (Latest) */}
       <section className="featured-artwork">
         <div className="featured-image">
           <a
@@ -31,7 +65,7 @@ export default function Artworks() {
             target="_blank"
             rel="noopener noreferrer"
           >
-            <img src={featured.image} alt={t(`artworks.${featured.titleKey}`)} />
+            <img src={featured.image} alt={featuredText.title} />
           </a>
         </div>
 
@@ -39,35 +73,30 @@ export default function Artworks() {
           <span className="featured-label">
             ✨ {t('artworks.featuredLabel')}
           </span>
-          <h2 className="featured-title">
-            {t(`artworks.${featured.titleKey}`)}
-          </h2>
+          <h2 className="featured-title">{featuredText.title}</h2>
           <p className="featured-date">{featured.date}</p>
-          
-          {/* main introduce */}
-          <p className="featured-desc">
-            {t(`artworks.${featured.titleKey}_desc`)}
-          </p>
+          <p className="featured-desc">{featuredText.desc}</p>
 
-          {/* FANBOX info */}
-          <div className="featured-bonus">
-            <p className="bonus-line">
-              <span className="bonus-tag">
-                【{t(`artworks.${featured.titleKey}_bonus_label`)}】
-              </span>
-              <span className="bonus-text">
-                {t(`artworks.${featured.titleKey}_bonus_text`)}
-              </span>
-            </p>
-            <a
-              href={t(`artworks.${featured.titleKey}_bonus_url`)}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bonus-link"
-            >
-              {t(`artworks.${featured.titleKey}_bonus_url`)}
-            </a>
-          </div>
+          {(featuredText.bonusLabel || featuredText.bonusText) && (
+            <div className="featured-bonus">
+              <p className="bonus-line">
+                {featuredText.bonusLabel && (
+                  <span className="bonus-tag">【{featuredText.bonusLabel}】</span>
+                )}
+                <span className="bonus-text">{featuredText.bonusText}</span>
+              </p>
+              {featuredText.bonusUrl && (
+                <a
+                  href={featuredText.bonusUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bonus-link"
+                >
+                  {featuredText.bonusUrl}
+                </a>
+              )}
+            </div>
+          )}
 
           <div className="featured-actions">
             <a
@@ -82,7 +111,6 @@ export default function Artworks() {
         </div>
       </section>
 
-      {/* Scroll down */}
       <div className="scroll-hint">
         <svg
           className="scroll-hint-arrow"
@@ -100,9 +128,7 @@ export default function Artworks() {
         </svg>
       </div>
 
-      {/* Auto-scrolling Artworks */}
       <section className="artworks-marquee">
-        {/* First Row */}
         <div className="marquee-row">
           <div className="marquee-track">
             {[...row1, ...row1].map((art, idx) => (
@@ -113,7 +139,6 @@ export default function Artworks() {
           </div>
         </div>
 
-        {/* Second Row */}
         <div className="marquee-row">
           <div className="marquee-track marquee-track-2">
             {[...row2, ...row2].map((art, idx) => (
@@ -125,31 +150,30 @@ export default function Artworks() {
         </div>
       </section>
 
-      {/* more artworks */}
-    <div className="more-artworks-wrap">
-      <a
-        href="https://www.pixiv.net/users/31690832"
-        target="_blank"
-        rel="noopener noreferrer"
-        className="more-artworks-btn"
-      >
-        <span>{t('artworks.moreButton')}</span>
-        <svg
-          className="more-arrow"
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+      <div className="more-artworks-wrap">
+        <a
+          href="https://www.pixiv.net/users/31690832"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="more-artworks-btn"
         >
-          <line x1="5" y1="12" x2="19" y2="12" />
-          <polyline points="12 5 19 12 12 19" />
-        </svg>
-      </a>
-    </div>
+          <span>{t('artworks.moreButton')}</span>
+          <svg
+            className="more-arrow"
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <line x1="5" y1="12" x2="19" y2="12" />
+            <polyline points="12 5 19 12 12 19" />
+          </svg>
+        </a>
+      </div>
     </main>
   );
 }
