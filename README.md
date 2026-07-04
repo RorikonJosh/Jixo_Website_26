@@ -12,3 +12,7 @@ Link: https://jixo-website-26.vercel.app/
 - Added new page -Commission Portfolio
 - Add General & R18 artwork preview
 2026-06-26
+--------------------------------------------------------------------------------------------
+## Version 3.0--
+- Added commission form to request
+- Linked with supabase
