@@ -77,35 +77,91 @@ function jsonResponse(body: Record<string, unknown>, status = 200) {
   });
 }
 
+function parseIdList(raw: string | undefined): string[] {
+  if (!raw) return [];
+  return raw
+    .split(',')
+    .map((id) => id.trim())
+    .filter((id) => /^\d+$/.test(id));
+}
+
+function buildDiscordMentions(userIds: string[], roleIds: string[]) {
+  if (userIds.length === 0 && roleIds.length === 0) {
+    return { content: undefined, allowed_mentions: undefined };
+  }
+
+  const parts = [
+    ...userIds.map((id) => `<@${id}>`),
+    ...roleIds.map((id) => `<@&${id}>`),
+  ];
+
+  return {
+    content: parts.join(' '),
+    allowed_mentions: {
+      parse: [] as string[],
+      users: userIds,
+      roles: roleIds,
+    },
+  };
+}
+
 async function sendDiscordWebhook(
   rowData: CommissionRow,
   webhookUrl: string,
   adminUrl: string,
+  mentionUserIds: string[],
+  mentionRoleIds: string[],
 ): Promise<boolean> {
   const fields: Array<{ name: string; value: string; inline?: boolean }> = [
     { name: 'Email', value: rowData.email, inline: true },
-    { name: 'Budget', value: rowData.budget || '—', inline: true },
-    { name: 'Deadline', value: rowData.deadline || '—', inline: true },
+    { name: '預算 (NTD)', value: rowData.budget || '—', inline: true },
+    { name: '希望交稿', value: rowData.deadline || '—', inline: true },
   ];
 
   if (rowData.contactHandle) {
     fields.push({
-      name: 'Contact',
+      name: '其他聯絡方式',
       value: truncate(rowData.contactHandle, DISCORD_FIELD_MAX),
     });
   }
 
-  const summary = rowData.purpose || rowData.characterDesc;
-  if (summary) {
+  if (rowData.purpose) {
     fields.push({
-      name: 'Summary',
-      value: truncate(summary, DISCORD_FIELD_MAX),
+      name: '委託用途',
+      value: truncate(rowData.purpose, DISCORD_FIELD_MAX),
     });
   }
 
+  if (rowData.characterDesc) {
+    fields.push({
+      name: '角色 / 內容描述',
+      value: truncate(rowData.characterDesc, DISCORD_FIELD_MAX),
+    });
+  }
+
+  if (rowData.styleNotes) {
+    fields.push({
+      name: '構圖 / 畫風',
+      value: truncate(rowData.styleNotes, DISCORD_FIELD_MAX),
+    });
+  }
+
+  if (rowData.referenceUrls) {
+    fields.push({
+      name: '參考連結',
+      value: truncate(rowData.referenceUrls, DISCORD_FIELD_MAX),
+    });
+  }
+
+  fields.push({
+    name: '用途類型',
+    value: rowData.usageType === 'commercial' ? '商用' : '非商用 / 個人',
+    inline: true,
+  });
+
   if (rowData.fileLinks.length > 0) {
     fields.push({
-      name: 'Reference files',
+      name: '參考圖',
       value: truncate(
         rowData.fileLinks.map((item) => item.url).join('\n'),
         DISCORD_FIELD_MAX,
@@ -114,18 +170,24 @@ async function sendDiscordWebhook(
   }
 
   fields.push({
-    name: 'Admin',
+    name: '後台管理',
     value: adminUrl,
   });
+
+  const { content, allowed_mentions } = buildDiscordMentions(
+    mentionUserIds,
+    mentionRoleIds,
+  );
 
   const discordRes = await fetch(webhookUrl, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      username: 'Commission Bot',
+      username: '委託通知',
+      ...(content ? { content, allowed_mentions } : {}),
       embeds: [
         {
-          title: `新委託：${rowData.name}${rowData.isR18 ? ' (R18)' : ''}`,
+          title: `新委託：${rowData.name}${rowData.isR18 ? ' · R18' : ''}`,
           color: rowData.isR18 ? 0xff4444 : 0x44aa88,
           fields,
           timestamp: new Date().toISOString(),
@@ -152,6 +214,8 @@ Deno.serve(async (req) => {
   }
 
   const discordWebhookUrl = Deno.env.get('DISCORD_WEBHOOK_URL');
+  const mentionUserIds = parseIdList(Deno.env.get('DISCORD_MENTION_USER_IDS'));
+  const mentionRoleIds = parseIdList(Deno.env.get('DISCORD_MENTION_ROLE_IDS'));
   const adminUrl =
     Deno.env.get('SITE_ADMIN_URL') ??
     'https://jixo-website-26.vercel.app/admin';
@@ -270,6 +334,8 @@ Deno.serve(async (req) => {
       rowData,
       discordWebhookUrl,
       adminUrl,
+      mentionUserIds,
+      mentionRoleIds,
     );
     if (!discordOk) {
       return jsonResponse(

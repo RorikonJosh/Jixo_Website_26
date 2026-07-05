@@ -91,10 +91,15 @@ Frontend calls `submit-commission` Edge Function after reference uploads. On suc
 supabase login
 supabase link --project-ref gngrfmyucxyuutzlotre
 supabase secrets set DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+# Optional: ping users or roles on new commission (numeric IDs, comma-separated)
+supabase secrets set DISCORD_MENTION_USER_IDS=123456789012345678
+supabase secrets set DISCORD_MENTION_ROLE_IDS=987654321098765432
 supabase secrets set SITE_ADMIN_URL=https://jixo-website-26.vercel.app/admin
 supabase functions deploy submit-commission
 ```
 
 Discord webhook: channel settings → Integrations → Webhooks → copy URL.
+
+**@ mention：** Settings → Advanced → Developer Mode → 右鍵用戶/身分組 → Copy User/Role ID → 設 `DISCORD_MENTION_USER_IDS` 或 `DISCORD_MENTION_ROLE_IDS`。
 
 Submissions always save to the database. If Discord fails, the form still succeeds (check Edge Function logs).
