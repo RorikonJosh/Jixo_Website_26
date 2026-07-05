@@ -77,82 +77,6 @@ function jsonResponse(body: Record<string, unknown>, status = 200) {
   });
 }
 
-function escapeHtml(value: string): string {
-  return value
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
-}
-
-function row(label: string, value: string): string {
-  if (!value) return '';
-  return `<tr><td style="padding:8px 12px;font-weight:600;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:8px 12px;white-space:pre-wrap;">${escapeHtml(value)}</td></tr>`;
-}
-
-function buildEmailHtml(rowData: CommissionRow): string {
-  const fileLinksHtml =
-    rowData.fileLinks.length > 0
-      ? `<h3>Reference files</h3><ul>${rowData.fileLinks
-          .map(
-            (item) =>
-              `<li><a href="${item.url}">${escapeHtml(item.path)}</a></li>`,
-          )
-          .join('')}</ul>`
-      : '';
-
-  return `
-    <h2>New commission request</h2>
-    <p>ID: ${escapeHtml(rowData.id)}</p>
-    <table style="border-collapse:collapse;width:100%;max-width:640px;">
-      ${row('Name', rowData.name)}
-      ${row('Email', rowData.email)}
-      ${row('Contact', rowData.contactHandle)}
-      ${row('Purpose', rowData.purpose)}
-      ${row('Character', rowData.characterDesc)}
-      ${row('Style / Composition', rowData.styleNotes)}
-      ${row('Reference URLs', rowData.referenceUrls)}
-      ${row('Budget', rowData.budget)}
-      ${row('Deadline', rowData.deadline ?? '')}
-      ${row('R18', rowData.isR18 ? 'Yes' : 'No')}
-      ${row('Usage', rowData.usageType)}
-      ${row('Locale', rowData.locale)}
-    </table>
-    ${fileLinksHtml}
-  `;
-}
-
-async function sendResendEmail(
-  rowData: CommissionRow,
-  options: {
-    apiKey: string;
-    notifyEmail: string;
-    from: string;
-  },
-): Promise<boolean> {
-  const emailRes = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${options.apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: options.from,
-      to: [options.notifyEmail],
-      reply_to: rowData.email,
-      subject: `[Commission] ${rowData.name}${rowData.isR18 ? ' (R18)' : ''}`,
-      html: buildEmailHtml(rowData),
-    }),
-  });
-
-  if (!emailRes.ok) {
-    console.error('Resend error:', await emailRes.text());
-    return false;
-  }
-
-  return true;
-}
-
 async function sendDiscordWebhook(
   rowData: CommissionRow,
   webhookUrl: string,
@@ -227,10 +151,6 @@ Deno.serve(async (req) => {
     return jsonResponse({ ok: false, error: 'Method not allowed' }, 405);
   }
 
-  const resendApiKey = Deno.env.get('RESEND_API_KEY');
-  const notifyEmail = Deno.env.get('NOTIFY_EMAIL') ?? 'jixo0407@gmail.com';
-  const resendFrom =
-    Deno.env.get('RESEND_FROM') ?? 'Commission Form <onboarding@resend.dev>';
   const discordWebhookUrl = Deno.env.get('DISCORD_WEBHOOK_URL');
   const adminUrl =
     Deno.env.get('SITE_ADMIN_URL') ??
@@ -345,41 +265,23 @@ Deno.serve(async (req) => {
     fileLinks,
   };
 
-  const warnings: string[] = [];
-
-  if (resendApiKey) {
-    const emailOk = await sendResendEmail(rowData, {
-      apiKey: resendApiKey,
-      notifyEmail,
-      from: resendFrom,
-    });
-    if (!emailOk) warnings.push('email_failed');
-  } else {
-    warnings.push('email_skipped');
-  }
-
   if (discordWebhookUrl) {
     const discordOk = await sendDiscordWebhook(
       rowData,
       discordWebhookUrl,
       adminUrl,
     );
-    if (!discordOk) warnings.push('discord_failed');
-  } else {
-    warnings.push('discord_skipped');
+    if (!discordOk) {
+      return jsonResponse(
+        {
+          ok: true,
+          id: inserted.id,
+          warning: 'Saved but Discord notification failed',
+        },
+        202,
+      );
+    }
   }
 
-  if (warnings.includes('email_failed') || warnings.includes('discord_failed')) {
-    return jsonResponse(
-      {
-        ok: true,
-        id: inserted.id,
-        warning: 'Saved but some notifications failed',
-        warnings,
-      },
-      202,
-    );
-  }
-
-  return jsonResponse({ ok: true, id: inserted.id, warnings });
+  return jsonResponse({ ok: true, id: inserted.id });
 });

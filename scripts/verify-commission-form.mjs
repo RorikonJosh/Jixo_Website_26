@@ -44,8 +44,8 @@ const edgeFn = readFileSync(
   join(root, 'supabase/functions/submit-commission/index.ts'),
   'utf8',
 );
-if (!edgeFn.includes('resend.com/emails')) {
-  console.error('Edge function missing Resend integration');
+if (!edgeFn.includes('DISCORD_WEBHOOK_URL')) {
+  console.error('Edge function missing Discord webhook integration');
   failed = true;
 }
 

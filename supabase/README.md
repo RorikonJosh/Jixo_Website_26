@@ -83,19 +83,13 @@ Path examples:
 
 ---
 
-## Commission notifications (Resend + Discord)
+## Commission notifications (Discord)
 
-Frontend calls `submit-commission` Edge Function after reference uploads. On success it sends:
-
-- **Email** via [Resend](https://resend.com) to `NOTIFY_EMAIL`
-- **Discord** embed to `DISCORD_WEBHOOK_URL` (optional but recommended)
+Frontend calls `submit-commission` Edge Function after reference uploads. On success it sends a **Discord embed** to `DISCORD_WEBHOOK_URL`.
 
 ```bash
 supabase login
 supabase link --project-ref gngrfmyucxyuutzlotre
-supabase secrets set RESEND_API_KEY=re_xxxx
-supabase secrets set NOTIFY_EMAIL=jixo0407@gmail.com
-supabase secrets set RESEND_FROM="Commission Form <onboarding@resend.dev>"
 supabase secrets set DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 supabase secrets set SITE_ADMIN_URL=https://jixo-website-26.vercel.app/admin
 supabase functions deploy submit-commission
@@ -103,4 +97,4 @@ supabase functions deploy submit-commission
 
 Discord webhook: channel settings → Integrations → Webhooks → copy URL.
 
-Until `RESEND_API_KEY` is set, submissions still save; email is skipped. Until `DISCORD_WEBHOOK_URL` is set, Discord is skipped.
+Submissions always save to the database. If Discord fails, the form still succeeds (check Edge Function logs).
