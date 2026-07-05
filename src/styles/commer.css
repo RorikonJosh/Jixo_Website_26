@@ -30,10 +30,32 @@
 /* Sections */
 .price-section,
 .process-section,
-.rights-section {
+.rights-section,
+.commer-request-section {
   padding: 1.2rem 1.5rem;
   margin-bottom: 1.5rem;
   border-radius: 8px;
+}
+
+.commer-request-section {
+  background: #f0f4ff;
+  border-left: 4px solid #1a1a4d;
+  text-align: center;
+}
+
+.commer-request-section h3 {
+  margin-top: 0;
+}
+
+.commer-request-note {
+  margin: 0 0 1rem;
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.commer-request-section .commission-form-block {
+  margin-top: 0;
 }
 
 .price-section {

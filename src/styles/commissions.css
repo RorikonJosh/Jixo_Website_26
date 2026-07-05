@@ -34,47 +34,8 @@ body.commissions-active.theme-r18::after {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 1.25rem;
+  margin-bottom: 3.5rem;
   animation: fadeInUp 0.8s ease-out;
-}
-
-/* Commission request CTA */
-.commissions-request-cta {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.75rem;
-  max-width: 640px;
-  margin: 0 auto 2.5rem;
-  padding: 0 1.5rem 0.5rem;
-  text-align: center;
-  animation: fadeInUp 0.8s ease-out 0.1s both;
-}
-
-.commissions-request-note {
-  margin: 0;
-  font-size: 0.92rem;
-  color: #6b6b9a;
-  letter-spacing: 0.04em;
-  line-height: 1.6;
-  transition: color 1.6s ease;
-}
-
-.commissions-request-cta .commission-form-block {
-  margin-top: 0;
-}
-
-.commissions-page--r18 .commissions-request-note {
-  color: rgba(255, 220, 220, 0.85);
-}
-
-.commissions-page--r18 .commission-form-toggle {
-  background: linear-gradient(135deg, #5c1a2e 0%, #8a2a45 100%);
-  box-shadow: 0 8px 20px rgba(92, 26, 46, 0.35);
-}
-
-.commissions-page--r18 .commission-form-toggle:hover {
-  box-shadow: 0 12px 28px rgba(92, 26, 46, 0.45);
 }
 
 /* Title ribbon */

@@ -1,6 +1,8 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import CommissionRequestForm from '../components/CommissionRequestForm';
 import '../styles/commer.css';
+import '../styles/commission-form.css';
 
 export default function Commer() {
   const { t } = useTranslation();
@@ -77,6 +79,12 @@ export default function Commer() {
               <p>{t('commer.copyright.buyoutDesc')}</p>
               <h4>{t('commer.copyright.nobuyout')}</h4>
               <p>{t('commer.copyright.nobuyoutDesc')}</p>
+            </div>
+
+            <div className="commer-request-section">
+              <h3>📋 {t('commer.requestCta')}</h3>
+              <p className="commer-request-note">{t('commer.requestNote')}</p>
+              <CommissionRequestForm />
             </div>
           </div>
         </div>

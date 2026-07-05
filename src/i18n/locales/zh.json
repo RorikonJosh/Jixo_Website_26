@@ -49,7 +49,9 @@
       "buyoutDesc": "意旨連同著作權都買下",
       "nobuyout": "不買斷5000NT以上",
       "nobuyoutDesc": "意旨作品的著作權歸於我，不能進行轉賣、讓其他人修改、以及商用的任何行為！"
-    }
+    },
+    "requestCta": "委託申請",
+    "requestNote": "閱讀完須知後，填寫表單即可送出委託申請。"
   },
     "artworks": {
     "pageTitle": "作品集",
@@ -82,8 +84,6 @@
     "pageSubtitle": "過往受託創作作品一覽",
     "featuredLabel": "最新委託",
     "moreWorks": "更多委託作品",
-    "requestCta": "委託申請",
-    "requestNote": "想要委託創作？填寫表單即可送出申請。",
     "tabGeneral": "全年齡",
     "tabR18": "R18",
     "clientLabel": "委託人",

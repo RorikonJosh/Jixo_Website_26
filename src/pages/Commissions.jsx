@@ -4,12 +4,10 @@ import CommissionCard from '../components/CommissionCard';
 import CommissionImageButton from '../components/CommissionImageButton';
 import CommissionLightbox from '../components/CommissionLightbox';
 import AgeGateModal from '../components/AgeGateModal';
-import CommissionRequestForm from '../components/CommissionRequestForm';
 import { fetchCommissionsForPage, resolveCommissionTexts } from '../lib/portfolio';
 import { isR18AgeConfirmed, setR18AgeConfirmed } from '../utils/r18AgeGate';
 import '../styles/artworks.css';
 import '../styles/commissions.css';
-import '../styles/commission-form.css';
 
 export default function Commissions() {
   const { t, i18n } = useTranslation();
@@ -118,11 +116,6 @@ export default function Commissions() {
           </button>
         </div>
       </header>
-
-      <section className="commissions-request-cta" aria-label={t('commissions.requestCta')}>
-        <p className="commissions-request-note">{t('commissions.requestNote')}</p>
-        <CommissionRequestForm />
-      </section>
 
       {loading && (
         <p className="admin-note" style={{ padding: '4rem 2rem', textAlign: 'center' }}>

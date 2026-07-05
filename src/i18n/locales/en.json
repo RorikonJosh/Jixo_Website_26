@@ -49,7 +49,9 @@
       "buyoutDesc": "(Which means purchasing full copyright.)",
       "nobuyout": "Not buying out for over 5,000 NT",
       "nobuyoutDesc": "(Which means I own the copyright; no resale, modification by others, or commercial use permitted.)"
-    }
+    },
+    "requestCta": "Commission request",
+    "requestNote": "After reading the guidelines, submit the form to apply."
   },
     "artworks": {
     "pageTitle": "作品集",
@@ -82,8 +84,6 @@
     "pageSubtitle": "A collection of commissioned works",
     "featuredLabel": "Latest Commission",
     "moreWorks": "More Commissions",
-    "requestCta": "Commission request",
-    "requestNote": "Interested in commissioning? Submit the form to apply.",
     "tabGeneral": "General",
     "tabR18": "R18",
     "clientLabel": "Client",

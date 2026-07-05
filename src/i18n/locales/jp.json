@@ -49,7 +49,9 @@
       "buyoutDesc": "(著作権を買います)",
       "nobuyout": "買い切れない 5000NT 以上",
       "nobuyoutDesc": "(作品の著作権は著者本人に帰属します、転売不可 改変不可 商用利用不可です!)"
-    }
+    },
+    "requestCta": "依頼申請",
+    "requestNote": "注意事項を確認のうえ、フォームから依頼を送信してください。"
   },
     "artworks": {
     "pageTitle": "作品集",
@@ -82,8 +84,6 @@
     "pageSubtitle": "これまでの委託作品一覧",
     "featuredLabel": "最新の依頼",
     "moreWorks": "その他の委託作品",
-    "requestCta": "依頼申請",
-    "requestNote": "依頼をご希望の方は、フォームからお申し込みください。",
     "tabGeneral": "全年齢",
     "tabR18": "R18",
     "clientLabel": "依頼者",
