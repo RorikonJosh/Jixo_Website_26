@@ -38,6 +38,25 @@ export function validateCommissionForm(form) {
   return { ok: true };
 }
 
+function buildInvokeBody(form, { referenceFiles, locale }) {
+  return {
+    name: form.name,
+    email: form.email,
+    contact_handle: form.contact_handle,
+    purpose: form.purpose,
+    character_desc: form.character_desc,
+    style_notes: form.style_notes,
+    reference_urls: form.reference_urls,
+    budget: form.budget,
+    deadline: form.deadline,
+    is_r18: form.is_r18,
+    usage_type: form.usage_type,
+    reference_files: referenceFiles,
+    locale,
+    website: form.website,
+  };
+}
+
 export async function submitCommissionRequest(supabase, form, { referenceFiles, locale }) {
   const validation = validateCommissionForm(form);
   if (!validation.ok) {
@@ -47,10 +66,14 @@ export async function submitCommissionRequest(supabase, form, { referenceFiles, 
     throw new Error(validation.reason);
   }
 
-  const record = buildCommissionRecord(form, { referenceFiles, locale });
-
-  const { error } = await supabase.from('commission_requests').insert(record);
+  const { data, error } = await supabase.functions.invoke('submit-commission', {
+    body: buildInvokeBody(form, { referenceFiles, locale }),
+  });
 
   if (error) throw error;
-  return { ok: true };
+  if (data?.ok === false) {
+    throw new Error(data.error ?? 'submit_failed');
+  }
+
+  return { ok: true, id: data?.id };
 }

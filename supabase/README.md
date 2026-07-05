@@ -83,21 +83,24 @@ Path examples:
 
 ---
 
-## Email notifications (deferred)
+## Commission notifications (Resend + Discord)
 
-When you are ready to enable email:
+Frontend calls `submit-commission` Edge Function after reference uploads. On success it sends:
 
-1. Create a [Resend](https://resend.com) account and API key
-2. Deploy the Edge Function:
+- **Email** via [Resend](https://resend.com) to `NOTIFY_EMAIL`
+- **Discord** embed to `DISCORD_WEBHOOK_URL` (optional but recommended)
 
 ```bash
 supabase login
 supabase link --project-ref gngrfmyucxyuutzlotre
 supabase secrets set RESEND_API_KEY=re_xxxx
 supabase secrets set NOTIFY_EMAIL=jixo0407@gmail.com
+supabase secrets set RESEND_FROM="Commission Form <onboarding@resend.dev>"
+supabase secrets set DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
+supabase secrets set SITE_ADMIN_URL=https://jixo-website-26.vercel.app/admin
 supabase functions deploy submit-commission
 ```
 
-3. Switch the frontend back to `supabase.functions.invoke('submit-commission', ...)` or keep direct insert + add a DB webhook later.
+Discord webhook: channel settings → Integrations → Webhooks → copy URL.
 
-Until then, **direct insert from the form is enough** — check Supabase Dashboard for new requests.
+Until `RESEND_API_KEY` is set, submissions still save; email is skipped. Until `DISCORD_WEBHOOK_URL` is set, Discord is skipped.

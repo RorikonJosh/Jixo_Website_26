@@ -21,6 +21,7 @@ const MAX_LEN = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_FILES = 3;
+const DISCORD_FIELD_MAX = 1024;
 
 type Payload = {
   submission_id?: string;
@@ -40,9 +41,33 @@ type Payload = {
   website?: string;
 };
 
+type SignedFileLink = { path: string; url: string };
+
+type CommissionRow = {
+  name: string;
+  email: string;
+  contactHandle: string;
+  purpose: string;
+  characterDesc: string;
+  styleNotes: string;
+  referenceUrls: string;
+  budget: string;
+  usageType: string;
+  locale: string;
+  isR18: boolean;
+  deadline: string | null;
+  id: string;
+  fileLinks: SignedFileLink[];
+};
+
 function trim(value: unknown, max: number): string {
   if (typeof value !== 'string') return '';
   return value.trim().slice(0, max);
+}
+
+function truncate(value: string, max: number): string {
+  if (value.length <= max) return value;
+  return `${value.slice(0, max - 1)}…`;
 }
 
 function jsonResponse(body: Record<string, unknown>, status = 200) {
@@ -65,6 +90,134 @@ function row(label: string, value: string): string {
   return `<tr><td style="padding:8px 12px;font-weight:600;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:8px 12px;white-space:pre-wrap;">${escapeHtml(value)}</td></tr>`;
 }
 
+function buildEmailHtml(rowData: CommissionRow): string {
+  const fileLinksHtml =
+    rowData.fileLinks.length > 0
+      ? `<h3>Reference files</h3><ul>${rowData.fileLinks
+          .map(
+            (item) =>
+              `<li><a href="${item.url}">${escapeHtml(item.path)}</a></li>`,
+          )
+          .join('')}</ul>`
+      : '';
+
+  return `
+    <h2>New commission request</h2>
+    <p>ID: ${escapeHtml(rowData.id)}</p>
+    <table style="border-collapse:collapse;width:100%;max-width:640px;">
+      ${row('Name', rowData.name)}
+      ${row('Email', rowData.email)}
+      ${row('Contact', rowData.contactHandle)}
+      ${row('Purpose', rowData.purpose)}
+      ${row('Character', rowData.characterDesc)}
+      ${row('Style / Composition', rowData.styleNotes)}
+      ${row('Reference URLs', rowData.referenceUrls)}
+      ${row('Budget', rowData.budget)}
+      ${row('Deadline', rowData.deadline ?? '')}
+      ${row('R18', rowData.isR18 ? 'Yes' : 'No')}
+      ${row('Usage', rowData.usageType)}
+      ${row('Locale', rowData.locale)}
+    </table>
+    ${fileLinksHtml}
+  `;
+}
+
+async function sendResendEmail(
+  rowData: CommissionRow,
+  options: {
+    apiKey: string;
+    notifyEmail: string;
+    from: string;
+  },
+): Promise<boolean> {
+  const emailRes = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${options.apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      from: options.from,
+      to: [options.notifyEmail],
+      reply_to: rowData.email,
+      subject: `[Commission] ${rowData.name}${rowData.isR18 ? ' (R18)' : ''}`,
+      html: buildEmailHtml(rowData),
+    }),
+  });
+
+  if (!emailRes.ok) {
+    console.error('Resend error:', await emailRes.text());
+    return false;
+  }
+
+  return true;
+}
+
+async function sendDiscordWebhook(
+  rowData: CommissionRow,
+  webhookUrl: string,
+  adminUrl: string,
+): Promise<boolean> {
+  const fields: Array<{ name: string; value: string; inline?: boolean }> = [
+    { name: 'Email', value: rowData.email, inline: true },
+    { name: 'Budget', value: rowData.budget || '—', inline: true },
+    { name: 'Deadline', value: rowData.deadline || '—', inline: true },
+  ];
+
+  if (rowData.contactHandle) {
+    fields.push({
+      name: 'Contact',
+      value: truncate(rowData.contactHandle, DISCORD_FIELD_MAX),
+    });
+  }
+
+  const summary = rowData.purpose || rowData.characterDesc;
+  if (summary) {
+    fields.push({
+      name: 'Summary',
+      value: truncate(summary, DISCORD_FIELD_MAX),
+    });
+  }
+
+  if (rowData.fileLinks.length > 0) {
+    fields.push({
+      name: 'Reference files',
+      value: truncate(
+        rowData.fileLinks.map((item) => item.url).join('\n'),
+        DISCORD_FIELD_MAX,
+      ),
+    });
+  }
+
+  fields.push({
+    name: 'Admin',
+    value: adminUrl,
+  });
+
+  const discordRes = await fetch(webhookUrl, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      username: 'Commission Bot',
+      embeds: [
+        {
+          title: `新委託：${rowData.name}${rowData.isR18 ? ' (R18)' : ''}`,
+          color: rowData.isR18 ? 0xff4444 : 0x44aa88,
+          fields,
+          timestamp: new Date().toISOString(),
+        },
+      ],
+    }),
+  });
+
+  if (!discordRes.ok) {
+    console.error('Discord webhook error:', await discordRes.text());
+    return false;
+  }
+
+  return true;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -78,6 +231,10 @@ Deno.serve(async (req) => {
   const notifyEmail = Deno.env.get('NOTIFY_EMAIL') ?? 'jixo0407@gmail.com';
   const resendFrom =
     Deno.env.get('RESEND_FROM') ?? 'Commission Form <onboarding@resend.dev>';
+  const discordWebhookUrl = Deno.env.get('DISCORD_WEBHOOK_URL');
+  const adminUrl =
+    Deno.env.get('SITE_ADMIN_URL') ??
+    'https://jixo-website-26.vercel.app/admin';
   const supabaseUrl = Deno.env.get('SUPABASE_URL');
   const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
 
@@ -156,77 +313,73 @@ Deno.serve(async (req) => {
     return jsonResponse({ ok: false, error: 'Failed to save request' }, 500);
   }
 
-  let fileLinksHtml = '';
+  const fileLinks: SignedFileLink[] = [];
   if (referenceFiles.length > 0) {
     const { data: signedUrls, error: signedError } = await supabase.storage
       .from('commission-refs')
       .createSignedUrls(referenceFiles, 60 * 60 * 24 * 7);
 
     if (!signedError && signedUrls) {
-      const links = signedUrls
-        .filter((item) => item.signedUrl)
-        .map(
-          (item) =>
-            `<li><a href="${item.signedUrl}">${escapeHtml(item.path ?? 'file')}</a></li>`,
-        )
-        .join('');
-      if (links) {
-        fileLinksHtml = `<h3>Reference files</h3><ul>${links}</ul>`;
+      for (const item of signedUrls) {
+        if (item.signedUrl && item.path) {
+          fileLinks.push({ path: item.path, url: item.signedUrl });
+        }
       }
     }
   }
 
-  const html = `
-    <h2>New commission request</h2>
-    <p>ID: ${escapeHtml(inserted.id)}</p>
-    <table style="border-collapse:collapse;width:100%;max-width:640px;">
-      ${row('Name', name)}
-      ${row('Email', email)}
-      ${row('Contact', contactHandle)}
-      ${row('Purpose', purpose)}
-      ${row('Character', characterDesc)}
-      ${row('Style / Composition', styleNotes)}
-      ${row('Reference URLs', referenceUrls)}
-      ${row('Budget', budget)}
-      ${row('Deadline', deadline ?? '')}
-      ${row('R18', isR18 ? 'Yes' : 'No')}
-      ${row('Usage', usageType)}
-      ${row('Locale', locale)}
-    </table>
-    ${fileLinksHtml}
-  `;
+  const rowData: CommissionRow = {
+    name,
+    email,
+    contactHandle,
+    purpose,
+    characterDesc,
+    styleNotes,
+    referenceUrls,
+    budget,
+    usageType,
+    locale,
+    isR18,
+    deadline,
+    id: inserted.id,
+    fileLinks,
+  };
 
-  if (!resendApiKey) {
-    return jsonResponse({ ok: true, id: inserted.id, emailSkipped: true });
+  const warnings: string[] = [];
+
+  if (resendApiKey) {
+    const emailOk = await sendResendEmail(rowData, {
+      apiKey: resendApiKey,
+      notifyEmail,
+      from: resendFrom,
+    });
+    if (!emailOk) warnings.push('email_failed');
+  } else {
+    warnings.push('email_skipped');
   }
 
-  const emailRes = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${resendApiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      from: resendFrom,
-      to: [notifyEmail],
-      reply_to: email,
-      subject: `[Commission] ${name}${isR18 ? ' (R18)' : ''}`,
-      html,
-    }),
-  });
+  if (discordWebhookUrl) {
+    const discordOk = await sendDiscordWebhook(
+      rowData,
+      discordWebhookUrl,
+      adminUrl,
+    );
+    if (!discordOk) warnings.push('discord_failed');
+  } else {
+    warnings.push('discord_skipped');
+  }
 
-  if (!emailRes.ok) {
-    const detail = await emailRes.text();
-    console.error('Resend error:', detail);
+  if (warnings.includes('email_failed') || warnings.includes('discord_failed')) {
     return jsonResponse(
       {
         ok: true,
         id: inserted.id,
-        warning: 'Saved but email notification failed',
+        warning: 'Saved but some notifications failed',
+        warnings,
       },
       202,
     );
   }
 
-  return jsonResponse({ ok: true, id: inserted.id });
+  return jsonResponse({ ok: true, id: inserted.id, warnings });
 });
