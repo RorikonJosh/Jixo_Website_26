@@ -13,6 +13,7 @@ import {
 import { isSupabaseConfigured } from '../lib/supabase';
 import AdminReferenceFiles from '../components/AdminReferenceFiles';
 import AdminPortfolioUpload from '../components/AdminPortfolioUpload';
+import AdminPortfolioManage from '../components/AdminPortfolioManage';
 import AdminCollapsibleSection from '../components/AdminCollapsibleSection';
 import '../styles/admin.css';
 
@@ -90,6 +91,7 @@ export default function Admin() {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [r18Filter, setR18Filter] = useState('all');
+  const [portfolioRefreshKey, setPortfolioRefreshKey] = useState(0);
 
   useEffect(() => {
     document.body.classList.add('com-bg');
@@ -241,11 +243,19 @@ export default function Admin() {
         </section>
 
         <AdminCollapsibleSection
+          title="作品管理"
+          subtitle="管理作品集與委托作品：刪除、設為最新展示"
+          defaultOpen
+        >
+          <AdminPortfolioManage refreshKey={portfolioRefreshKey} />
+        </AdminCollapsibleSection>
+
+        <AdminCollapsibleSection
           title="上傳新作品"
           subtitle="發布到作品集或委托作品集頁面"
           defaultOpen={false}
         >
-          <AdminPortfolioUpload />
+          <AdminPortfolioUpload onPublished={() => setPortfolioRefreshKey((key) => key + 1)} />
         </AdminCollapsibleSection>
 
         {pageError && (

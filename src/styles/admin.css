@@ -600,8 +600,64 @@
 
 .admin-portfolio-toolbar {
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
   margin-bottom: 1rem;
+}
+
+.admin-portfolio-manage {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-portfolio-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.admin-portfolio-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid rgba(26, 26, 77, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #2c3e50;
+  font: inherit;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.admin-portfolio-tab:hover {
+  border-color: rgba(26, 26, 77, 0.22);
+}
+
+.admin-portfolio-tab.is-active {
+  background: #1a1a4d;
+  border-color: #1a1a4d;
+  color: #fff;
+}
+
+.admin-portfolio-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.35rem;
+  padding: 0.05rem 0.35rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.admin-portfolio-tab.is-active .admin-portfolio-tab-count {
+  background: rgba(255, 255, 255, 0.18);
 }
 
 .admin-brand-card--collapsed .admin-brand-content--dashboard {
@@ -665,18 +721,6 @@
 }
 
 .admin-portfolio-list {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.admin-portfolio-list h2 {
-  font-size: 1.05rem;
-  margin: 0 0 1rem;
-  color: #2c3e50;
-}
-
-.admin-portfolio-list ul {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -725,6 +769,45 @@
   color: #1a1a4d;
   font-size: 0.75rem;
   font-weight: 700;
+}
+
+.admin-confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  background: rgba(10, 12, 28, 0.5);
+  backdrop-filter: blur(6px);
+}
+
+.admin-confirm-dialog {
+  width: min(100%, 420px);
+  padding: 1.35rem 1.4rem 1.2rem;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+}
+
+.admin-confirm-title {
+  margin: 0 0 0.65rem;
+  font-size: 1.1rem;
+  color: #1a1a4d;
+}
+
+.admin-confirm-message {
+  margin: 0 0 1.15rem;
+  color: #4a5568;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.admin-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }
 
 @media (max-width: 768px) {

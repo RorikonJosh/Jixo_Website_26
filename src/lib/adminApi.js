@@ -128,13 +128,25 @@ export async function fetchAdminPortfolioItems() {
   return data ?? [];
 }
 
-export async function deletePortfolioItem(itemId) {
+export async function deletePortfolioItem(item) {
   const client = requireClient();
-  const { error } = await client.rpc('admin_delete_portfolio_item', {
+  const paths = [item.image_path, item.fullsize_path].filter(Boolean);
+
+  for (const storagePath of paths) {
+    await registerPortfolioUpload(storagePath);
+  }
+
+  const { data, error } = await client.rpc('admin_delete_portfolio_item', {
     input_password: getAdminPassword(),
-    item_id: itemId,
+    item_id: item.id,
   });
   if (error) throw error;
+  if (!data) throw new Error('not_found');
+
+  if (paths.length > 0) {
+    const { error: storageError } = await client.storage.from('portfolio').remove(paths);
+    if (storageError) throw storageError;
+  }
 }
 
 export async function setPortfolioFeatured(itemId) {

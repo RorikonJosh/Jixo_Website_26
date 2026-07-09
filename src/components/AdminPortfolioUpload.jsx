@@ -1,16 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   createPortfolioItem,
-  deletePortfolioItem,
-  fetchAdminPortfolioItems,
   registerPortfolioUpload,
-  setPortfolioFeatured,
 } from '../lib/adminApi';
 import {
   buildPortfolioPayload,
   buildPortfolioStoragePaths,
 } from '../lib/portfolio';
-import { PORTFOLIO_BUCKET, portfolioUrl } from '../lib/portfolioStorage';
+import { PORTFOLIO_BUCKET } from '../lib/portfolioStorage';
 import { supabase } from '../lib/supabase';
 
 const PAGE_OPTIONS = [
@@ -60,15 +57,13 @@ async function uploadPortfolioFile(path, file) {
   if (error) throw error;
 }
 
-export default function AdminPortfolioUpload() {
+export default function AdminPortfolioUpload({ onPublished }) {
   const [form, setForm] = useState(INITIAL_FORM);
   const [thumbFile, setThumbFile] = useState(null);
   const [fullsizeFile, setFullsizeFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [items, setItems] = useState([]);
-  const [loadingList, setLoadingList] = useState(false);
 
   const { pageType, commissionCategory } = parsePageTarget(form.pageTarget);
   const isCommission = pageType === 'commission';
@@ -76,23 +71,6 @@ export default function AdminPortfolioUpload() {
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
-
-  const loadItems = async () => {
-    setLoadingList(true);
-    try {
-      const rows = await fetchAdminPortfolioItems();
-      setItems(rows);
-    } catch (err) {
-      console.error(err);
-      setError('無法載入作品列表。');
-    } finally {
-      setLoadingList(false);
-    }
-  };
-
-  useEffect(() => {
-    loadItems();
-  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -167,7 +145,7 @@ export default function AdminPortfolioUpload() {
       setThumbFile(null);
       setFullsizeFile(null);
       event.target.reset();
-      await loadItems();
+      onPublished?.();
     } catch (err) {
       console.error(err);
       const detail = err?.message ?? err?.error_description ?? String(err);
@@ -185,44 +163,8 @@ export default function AdminPortfolioUpload() {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm('確定刪除此作品？（資料庫與 Storage 圖片會一併刪除）')) return;
-    try {
-      await deletePortfolioItem(id);
-      setItems((rows) => rows.filter((row) => row.id !== id));
-      setMessage('作品已刪除。');
-    } catch (err) {
-      console.error(err);
-      setError('刪除失敗。');
-    }
-  };
-
-  const handleSetFeatured = async (id) => {
-    setError('');
-    setMessage('');
-    try {
-      await setPortfolioFeatured(id);
-      await loadItems();
-      setMessage('已設為該分類的最新展示作品。');
-    } catch (err) {
-      console.error(err);
-      setError('設定失敗。');
-    }
-  };
-
-  const pageLabel = (row) => {
-    if (row.page_type === 'artwork') return '作品集';
-    return row.commission_category === 'r18' ? '委托 R18' : '委托 一般';
-  };
-
   return (
     <div className="admin-portfolio">
-      <div className="admin-portfolio-toolbar">
-        <button type="button" className="admin-btn" onClick={loadItems} disabled={loadingList}>
-          {loadingList ? '載入中…' : '載入已發布列表'}
-        </button>
-      </div>
-
       <form className="admin-portfolio-form" onSubmit={handleSubmit}>
         <fieldset className="admin-form-section">
           <legend>發布位置</legend>
@@ -417,44 +359,6 @@ export default function AdminPortfolioUpload() {
           {submitting ? '上傳中…' : '發布作品'}
         </button>
       </form>
-
-      {items.length > 0 && (
-        <div className="admin-portfolio-list">
-          <h2>已從後台發布的作品</h2>
-          <ul>
-            {items.map((row) => (
-              <li key={row.id} className="admin-portfolio-list-item">
-                <img src={portfolioUrl(row.image_path)} alt="" />
-                <div className="admin-portfolio-list-body">
-                  <strong>{row.title_zh || row.title_jp || '—'}</strong>
-                  <p className="admin-meta">{pageLabel(row)} · {row.display_date}</p>
-                  {row.featured && (
-                    <span className="admin-badge admin-badge--featured">最新展示</span>
-                  )}
-                </div>
-                <div className="admin-portfolio-list-actions">
-                  {!row.featured && (
-                    <button
-                      type="button"
-                      className="admin-btn admin-btn-primary admin-btn--small"
-                      onClick={() => handleSetFeatured(row.id)}
-                    >
-                      設為最新展示
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="admin-btn admin-btn-danger admin-btn--small"
-                    onClick={() => handleDelete(row.id)}
-                  >
-                    刪除
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </div>
   );
 }
