@@ -165,7 +165,16 @@ export default function AdminPortfolioUpload() {
       await loadItems();
     } catch (err) {
       console.error(err);
-      setError('上傳失敗。請確認已執行 portfolio_items SQL migration。');
+      const detail = err?.message ?? err?.error_description ?? String(err);
+      if (detail.includes('portfolio_upload_sessions') || detail.includes('row-level security')) {
+        setError('上傳失敗：Storage 權限未設定完整。請在 Supabase 執行最新 portfolio migration。');
+      } else if (detail.includes('Unauthorized') || detail.includes('42501')) {
+        setError('上傳失敗：管理密碼錯誤或已過期，請重新登入 Admin。');
+      } else if (detail.includes('Bucket not found')) {
+        setError('上傳失敗：portfolio Storage bucket 尚未建立。');
+      } else {
+        setError(`上傳失敗：${detail}`);
+      }
     } finally {
       setSubmitting(false);
     }
