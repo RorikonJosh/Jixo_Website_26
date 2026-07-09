@@ -57,6 +57,7 @@ function mapDbRow(row) {
     source: 'db',
     pageType: row.page_type,
     category: row.commission_category,
+    featured: Boolean(row.featured),
     date: row.display_date,
     sortDate: row.sort_date,
     platform: row.platform || 'Pixiv',
@@ -84,8 +85,12 @@ function mapDbRow(row) {
   };
 }
 
-function sortByDateDesc(items) {
+function sortPortfolioItems(items) {
   return [...items].sort((a, b) => {
+    const featuredA = a.featured ? 1 : 0;
+    const featuredB = b.featured ? 1 : 0;
+    if (featuredB !== featuredA) return featuredB - featuredA;
+
     const dateA = new Date(parseDisplayDateToSort(a.date));
     const dateB = new Date(parseDisplayDateToSort(b.date));
     return dateB - dateA;
@@ -95,7 +100,7 @@ function sortByDateDesc(items) {
 function mergeByImagePath(dbItems, staticItems) {
   const dbPaths = new Set(dbItems.map((item) => item.imagePath || item.image));
   const legacy = staticItems.filter((item) => !dbPaths.has(item.imagePath) && !dbPaths.has(item.image));
-  return sortByDateDesc([...dbItems, ...legacy]);
+  return sortPortfolioItems([...dbItems, ...legacy]);
 }
 
 export async function fetchPublicPortfolioItems(pageType = null) {

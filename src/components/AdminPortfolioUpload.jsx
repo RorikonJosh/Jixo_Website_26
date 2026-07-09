@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   createPortfolioItem,
   deletePortfolioItem,
   fetchAdminPortfolioItems,
   registerPortfolioUpload,
+  setPortfolioFeatured,
 } from '../lib/adminApi';
 import {
   buildPortfolioPayload,
@@ -89,6 +90,10 @@ export default function AdminPortfolioUpload() {
     }
   };
 
+  useEffect(() => {
+    loadItems();
+  }, []);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError('');
@@ -157,7 +162,7 @@ export default function AdminPortfolioUpload() {
         fullsizePath: paths.fullsizePath,
       }));
 
-      setMessage('作品已發布！訪客可在對應頁面看到。');
+      setMessage('作品已發布並設為最新展示！先前的最新作品會自動排到下方展示區。');
       setForm(INITIAL_FORM);
       setThumbFile(null);
       setFullsizeFile(null);
@@ -181,13 +186,27 @@ export default function AdminPortfolioUpload() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('確定刪除此作品資料？（Storage 圖片需手動刪除）')) return;
+    if (!window.confirm('確定刪除此作品？（資料庫與 Storage 圖片會一併刪除）')) return;
     try {
       await deletePortfolioItem(id);
       setItems((rows) => rows.filter((row) => row.id !== id));
+      setMessage('作品已刪除。');
     } catch (err) {
       console.error(err);
       setError('刪除失敗。');
+    }
+  };
+
+  const handleSetFeatured = async (id) => {
+    setError('');
+    setMessage('');
+    try {
+      await setPortfolioFeatured(id);
+      await loadItems();
+      setMessage('已設為該分類的最新展示作品。');
+    } catch (err) {
+      console.error(err);
+      setError('設定失敗。');
     }
   };
 
@@ -406,17 +425,31 @@ export default function AdminPortfolioUpload() {
             {items.map((row) => (
               <li key={row.id} className="admin-portfolio-list-item">
                 <img src={portfolioUrl(row.image_path)} alt="" />
-                <div>
+                <div className="admin-portfolio-list-body">
                   <strong>{row.title_zh || row.title_jp || '—'}</strong>
                   <p className="admin-meta">{pageLabel(row)} · {row.display_date}</p>
+                  {row.featured && (
+                    <span className="admin-badge admin-badge--featured">最新展示</span>
+                  )}
                 </div>
-                <button
-                  type="button"
-                  className="admin-btn admin-btn-danger admin-btn--small"
-                  onClick={() => handleDelete(row.id)}
-                >
-                  刪除
-                </button>
+                <div className="admin-portfolio-list-actions">
+                  {!row.featured && (
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-primary admin-btn--small"
+                      onClick={() => handleSetFeatured(row.id)}
+                    >
+                      設為最新展示
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-danger admin-btn--small"
+                    onClick={() => handleDelete(row.id)}
+                  >
+                    刪除
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

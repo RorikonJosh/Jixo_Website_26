@@ -136,3 +136,13 @@ export async function deletePortfolioItem(itemId) {
   });
   if (error) throw error;
 }
+
+export async function setPortfolioFeatured(itemId) {
+  const client = requireClient();
+  const { data, error } = await client.rpc('admin_set_portfolio_featured', {
+    input_password: getAdminPassword(),
+    item_id: itemId,
+  });
+  if (error) throw error;
+  return Boolean(data);
+}

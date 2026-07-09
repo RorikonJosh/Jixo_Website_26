@@ -703,9 +703,28 @@
   flex-shrink: 0;
 }
 
-.admin-portfolio-list-item > div {
+.admin-portfolio-list-item > div,
+.admin-portfolio-list-body {
   flex: 1;
   min-width: 0;
+}
+
+.admin-portfolio-list-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  justify-content: flex-end;
+}
+
+.admin-badge--featured {
+  display: inline-block;
+  margin-top: 0.35rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(26, 26, 77, 0.1);
+  color: #1a1a4d;
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 @media (max-width: 768px) {
