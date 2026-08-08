@@ -192,6 +192,22 @@
   gap: 1rem;
 }
 
+.commission-check-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.1rem;
+}
+
+.commission-type-other {
+  margin-top: 0.65rem;
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(26, 26, 77, 0.15);
+  border-radius: 10px;
+  font: inherit;
+  background: #fff;
+}
+
 .commission-radio,
 .commission-checkbox {
   display: inline-flex;

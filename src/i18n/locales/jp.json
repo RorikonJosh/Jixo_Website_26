@@ -129,6 +129,25 @@
         "email": "メールアドレス",
         "contactHandle": "その他の連絡先",
         "contactHandlePlaceholder": "Twitter、Discord など（任意）",
+        "contactPlatforms": {
+          "discord": "Discord",
+          "facebook": "Facebook",
+          "other": "その他"
+        },
+        "contactHandlePlaceholders": {
+          "discord": "Discord ユーザー名 / ID（任意）",
+          "facebook": "Facebook 名またはリンク（任意）",
+          "other": "連絡先を入力（任意）"
+        },
+        "commissionType": "依頼タイプ",
+        "commissionTypes": {
+          "chibi": "デフォルメ / Q版",
+          "bust": "頭身・バストアップ",
+          "illustration": "イラスト（太もも以上）",
+          "fullbody": "全身・立ち絵",
+          "other": "その他"
+        },
+        "commissionTypeOtherPlaceholder": "その他の内容を簡単に記入（任意）",
         "purpose": "用途",
         "characterDesc": "キャラクター / 内容の説明",
         "styleNotes": "構図 / 画風の希望",
@@ -154,7 +173,8 @@
         "errorUpload": "参考画像のアップロードに失敗しました。Storage 設定を確認するか、画像なしで再度お試しください。",
         "errorFiles": "一部のファイル形式またはサイズが無効です。",
         "errorNotConfigured": "フォームサービスが設定されていません。",
-        "errorRequiredContent": "「用途」または「キャラクター / 内容の説明」のいずれかを入力してください。"
+        "errorRequiredContent": "「用途」または「キャラクター / 内容の説明」のいずれかを入力してください。",
+        "errorRequiredTypes": "依頼タイプを1つ以上選択してください。"
       },
       "twitter": {
         "title": "𝕏 Twitter",

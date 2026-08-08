@@ -10,12 +10,17 @@ import {
   supabase,
 } from '../lib/supabase';
 import { submitCommissionRequest } from '../lib/submitCommissionRequest';
+import { COMMISSION_TYPE_VALUES } from '../lib/commissionTypes';
+import { CONTACT_PLATFORM_VALUES } from '../lib/contactPlatform';
 import '../styles/commission-form.css';
 
 const INITIAL_FORM = {
   name: '',
   email: '',
+  contact_platform: '',
   contact_handle: '',
+  commission_types: [],
+  commission_type_other: '',
   purpose: '',
   character_desc: '',
   style_notes: '',
@@ -44,6 +49,24 @@ export default function CommissionRequestForm() {
       { value: 'personal', label: t('contact.form.usagePersonal') },
       { value: 'commercial', label: t('contact.form.usageCommercial') },
     ],
+    [t],
+  );
+
+  const typeOptions = useMemo(
+    () =>
+      COMMISSION_TYPE_VALUES.map((value) => ({
+        value,
+        label: t(`contact.form.commissionTypes.${value}`),
+      })),
+    [t],
+  );
+
+  const platformOptions = useMemo(
+    () =>
+      CONTACT_PLATFORM_VALUES.map((value) => ({
+        value,
+        label: t(`contact.form.contactPlatforms.${value}`),
+      })),
     [t],
   );
 
@@ -77,6 +100,22 @@ export default function CommissionRequestForm() {
 
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const toggleCommissionType = (value) => {
+    setForm((prev) => {
+      const selected = prev.commission_types.includes(value)
+        ? prev.commission_types.filter((item) => item !== value)
+        : [...prev.commission_types, value];
+      return {
+        ...prev,
+        commission_types: selected,
+        commission_type_other: selected.includes('other')
+          ? prev.commission_type_other
+          : '',
+      };
+    });
+    setErrorKey('');
   };
 
   const handleFileChange = (event) => {
@@ -128,6 +167,12 @@ export default function CommissionRequestForm() {
       return;
     }
 
+    if (form.commission_types.length === 0) {
+      setStatus('error');
+      setErrorKey('contact.form.errorRequiredTypes');
+      return;
+    }
+
     if (!form.purpose.trim() && !form.character_desc.trim()) {
       setStatus('error');
       setErrorKey('contact.form.errorRequiredContent');
@@ -162,6 +207,8 @@ export default function CommissionRequestForm() {
         setErrorKey('contact.form.errorUpload');
       } else if (err?.message === 'content') {
         setErrorKey('contact.form.errorRequiredContent');
+      } else if (err?.message === 'types') {
+        setErrorKey('contact.form.errorRequiredTypes');
       } else {
         setErrorKey('contact.form.errorSubmit');
       }
@@ -255,16 +302,59 @@ export default function CommissionRequestForm() {
                     />
                   </label>
 
-                  <label className="commission-field commission-field--full">
-                    <span>{t('contact.form.contactHandle')}</span>
-                    <input
-                      type="text"
-                      maxLength={200}
-                      placeholder={t('contact.form.contactHandlePlaceholder')}
-                      value={form.contact_handle}
-                      onChange={(e) => updateField('contact_handle', e.target.value)}
-                    />
-                  </label>
+                  <div className="commission-field commission-field--full">
+                    <span className="commission-field-label">{t('contact.form.contactHandle')}</span>
+                    <div className="commission-radio-group">
+                      {platformOptions.map((option) => (
+                        <label key={option.value} className="commission-radio">
+                          <input
+                            type="radio"
+                            name="contact_platform"
+                            value={option.value}
+                            checked={form.contact_platform === option.value}
+                            onChange={(e) => updateField('contact_platform', e.target.value)}
+                          />
+                          {option.label}
+                        </label>
+                      ))}
+                    </div>
+                    {form.contact_platform && (
+                      <input
+                        type="text"
+                        className="commission-type-other"
+                        maxLength={200}
+                        placeholder={t(`contact.form.contactHandlePlaceholders.${form.contact_platform}`)}
+                        value={form.contact_handle}
+                        onChange={(e) => updateField('contact_handle', e.target.value)}
+                      />
+                    )}
+                  </div>
+
+                  <div className="commission-field commission-field--full">
+                    <span className="commission-field-label">{t('contact.form.commissionType')} *</span>
+                    <div className="commission-check-group">
+                      {typeOptions.map((option) => (
+                        <label key={option.value} className="commission-checkbox">
+                          <input
+                            type="checkbox"
+                            checked={form.commission_types.includes(option.value)}
+                            onChange={() => toggleCommissionType(option.value)}
+                          />
+                          {option.label}
+                        </label>
+                      ))}
+                    </div>
+                    {form.commission_types.includes('other') && (
+                      <input
+                        type="text"
+                        className="commission-type-other"
+                        maxLength={500}
+                        placeholder={t('contact.form.commissionTypeOtherPlaceholder')}
+                        value={form.commission_type_other}
+                        onChange={(e) => updateField('commission_type_other', e.target.value)}
+                      />
+                    )}
+                  </div>
 
                   <label className="commission-field commission-field--full">
                     <span>{t('contact.form.purpose')}</span>

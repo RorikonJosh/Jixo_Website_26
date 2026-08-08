@@ -17,6 +17,31 @@ const MAX_LEN = {
   reference_urls: 2000,
   usage_type: 50,
   locale: 10,
+  commission_type_other: 500,
+};
+
+const ALLOWED_COMMISSION_TYPES = [
+  'chibi',
+  'bust',
+  'illustration',
+  'fullbody',
+  'other',
+] as const;
+
+const COMMISSION_TYPE_LABELS_ZH: Record<string, string> = {
+  chibi: 'Q版',
+  bust: '頭像、胸像',
+  illustration: '插畫（大腿以上）',
+  fullbody: '整身、立繪',
+  other: '其他',
+};
+
+const ALLOWED_CONTACT_PLATFORMS = ['discord', 'facebook', 'other'] as const;
+
+const CONTACT_PLATFORM_LABELS_ZH: Record<string, string> = {
+  discord: 'Discord',
+  facebook: 'Facebook',
+  other: '其他',
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -27,6 +52,7 @@ type Payload = {
   submission_id?: string;
   name?: string;
   email?: string;
+  contact_platform?: string;
   contact_handle?: string;
   purpose?: string;
   character_desc?: string;
@@ -36,6 +62,8 @@ type Payload = {
   deadline?: string;
   is_r18?: boolean;
   usage_type?: string;
+  commission_types?: string[];
+  commission_type_other?: string;
   reference_files?: string[];
   locale?: string;
   website?: string;
@@ -46,13 +74,14 @@ type SignedFileLink = { path: string; url: string };
 type CommissionRow = {
   name: string;
   email: string;
-  contactHandle: string;
+  contactLabel: string;
   purpose: string;
   characterDesc: string;
   styleNotes: string;
   referenceUrls: string;
   budget: string;
   usageType: string;
+  commissionTypesLabel: string;
   locale: string;
   isR18: boolean;
   deadline: string | null;
@@ -68,6 +97,42 @@ function trim(value: unknown, max: number): string {
 function truncate(value: string, max: number): string {
   if (value.length <= max) return value;
   return `${value.slice(0, max - 1)}…`;
+}
+
+function normalizeCommissionTypes(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter((value): value is string => typeof value === 'string')
+    .map((value) => value.trim())
+    .filter((value) =>
+      (ALLOWED_COMMISSION_TYPES as readonly string[]).includes(value),
+    );
+}
+
+function formatCommissionTypesLabel(types: string[], otherText: string): string {
+  const labels = types.map((value) => COMMISSION_TYPE_LABELS_ZH[value] ?? value);
+  if (!labels.length) return '—';
+  const base = labels.join('、');
+  if (types.includes('other') && otherText) {
+    return `${base}（${otherText}）`;
+  }
+  return base;
+}
+
+function normalizeContactPlatform(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null;
+  const value = raw.trim().toLowerCase();
+  return (ALLOWED_CONTACT_PLATFORMS as readonly string[]).includes(value)
+    ? value
+    : null;
+}
+
+function formatContactLabel(platform: string | null, handle: string): string {
+  const label = platform ? CONTACT_PLATFORM_LABELS_ZH[platform] : '';
+  if (label && handle) return `${label}：${handle}`;
+  if (label) return label;
+  if (handle) return handle;
+  return '';
 }
 
 function jsonResponse(body: Record<string, unknown>, status = 200) {
@@ -118,12 +183,17 @@ async function sendDiscordWebhook(
     { name: '希望交稿', value: rowData.deadline || '—', inline: true },
   ];
 
-  if (rowData.contactHandle) {
+  if (rowData.contactLabel) {
     fields.push({
       name: '其他聯絡方式',
-      value: truncate(rowData.contactHandle, DISCORD_FIELD_MAX),
+      value: truncate(rowData.contactLabel, DISCORD_FIELD_MAX),
     });
   }
+
+  fields.push({
+    name: '委託類型',
+    value: truncate(rowData.commissionTypesLabel, DISCORD_FIELD_MAX),
+  });
 
   if (rowData.purpose) {
     fields.push({
@@ -239,6 +309,7 @@ Deno.serve(async (req) => {
 
   const name = trim(payload.name, MAX_LEN.name);
   const email = trim(payload.email, MAX_LEN.email);
+  const contactPlatform = normalizeContactPlatform(payload.contact_platform);
   const contactHandle = trim(payload.contact_handle, MAX_LEN.contact_handle);
   const purpose = trim(payload.purpose, MAX_LEN.purpose);
   const characterDesc = trim(payload.character_desc, MAX_LEN.character_desc);
@@ -249,6 +320,12 @@ Deno.serve(async (req) => {
   const locale = trim(payload.locale, MAX_LEN.locale) || 'jp';
   const isR18 = Boolean(payload.is_r18);
   const deadline = trim(payload.deadline ?? '', 10) || null;
+  const commissionTypes = normalizeCommissionTypes(payload.commission_types);
+  const commissionTypeOther = trim(
+    payload.commission_type_other,
+    MAX_LEN.commission_type_other,
+  );
+  const contactLabel = formatContactLabel(contactPlatform, contactHandle);
 
   const referenceFiles = Array.isArray(payload.reference_files)
     ? payload.reference_files
@@ -258,6 +335,10 @@ Deno.serve(async (req) => {
 
   if (!name || !email || !EMAIL_RE.test(email)) {
     return jsonResponse({ ok: false, error: 'Invalid name or email' }, 400);
+  }
+
+  if (commissionTypes.length === 0) {
+    return jsonResponse({ ok: false, error: 'Commission type required' }, 400);
   }
 
   if (!purpose && !characterDesc) {
@@ -274,6 +355,7 @@ Deno.serve(async (req) => {
     .insert({
       name,
       email,
+      contact_platform: contactPlatform,
       contact_handle: contactHandle || null,
       purpose: purpose || null,
       character_desc: characterDesc || null,
@@ -285,6 +367,10 @@ Deno.serve(async (req) => {
       deadline: deadline || null,
       is_r18: isR18,
       usage_type: usageType,
+      commission_types: commissionTypes,
+      commission_type_other: commissionTypes.includes('other')
+        ? commissionTypeOther || null
+        : null,
       reference_files: referenceFiles,
       locale,
       status: 'pending',
@@ -315,13 +401,17 @@ Deno.serve(async (req) => {
   const rowData: CommissionRow = {
     name,
     email,
-    contactHandle,
+    contactLabel,
     purpose,
     characterDesc,
     styleNotes,
     referenceUrls,
     budget,
     usageType,
+    commissionTypesLabel: formatCommissionTypesLabel(
+      commissionTypes,
+      commissionTypeOther,
+    ),
     locale,
     isR18,
     deadline,

@@ -1,9 +1,15 @@
+import { normalizeCommissionTypes } from './commissionTypes';
+import { normalizeContactPlatform } from './contactPlatform';
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function buildCommissionRecord(form, { referenceFiles, locale }) {
+  const commissionTypes = normalizeCommissionTypes(form.commission_types);
+  const contactPlatform = normalizeContactPlatform(form.contact_platform);
   return {
     name: form.name.trim().slice(0, 100),
     email: form.email.trim().slice(0, 254),
+    contact_platform: contactPlatform,
     contact_handle: form.contact_handle.trim().slice(0, 200) || null,
     purpose: form.purpose.trim().slice(0, 2000) || null,
     character_desc: form.character_desc.trim().slice(0, 4000) || null,
@@ -16,6 +22,10 @@ export function buildCommissionRecord(form, { referenceFiles, locale }) {
     deadline: form.deadline || null,
     is_r18: Boolean(form.is_r18),
     usage_type: form.usage_type || 'personal',
+    commission_types: commissionTypes,
+    commission_type_other: commissionTypes.includes('other')
+      ? form.commission_type_other.trim().slice(0, 500) || null
+      : null,
     reference_files: referenceFiles,
     locale: locale || 'jp',
     status: 'pending',
@@ -31,6 +41,10 @@ export function validateCommissionForm(form) {
     return { ok: false, reason: 'identity' };
   }
 
+  if (normalizeCommissionTypes(form.commission_types).length === 0) {
+    return { ok: false, reason: 'types' };
+  }
+
   if (!form.purpose.trim() && !form.character_desc.trim()) {
     return { ok: false, reason: 'content' };
   }
@@ -39,9 +53,11 @@ export function validateCommissionForm(form) {
 }
 
 function buildInvokeBody(form, { referenceFiles, locale }) {
+  const commissionTypes = normalizeCommissionTypes(form.commission_types);
   return {
     name: form.name,
     email: form.email,
+    contact_platform: form.contact_platform,
     contact_handle: form.contact_handle,
     purpose: form.purpose,
     character_desc: form.character_desc,
@@ -51,6 +67,10 @@ function buildInvokeBody(form, { referenceFiles, locale }) {
     deadline: form.deadline,
     is_r18: form.is_r18,
     usage_type: form.usage_type,
+    commission_types: commissionTypes,
+    commission_type_other: commissionTypes.includes('other')
+      ? form.commission_type_other
+      : '',
     reference_files: referenceFiles,
     locale,
     website: form.website,

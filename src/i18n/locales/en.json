@@ -129,6 +129,25 @@
         "email": "Email",
         "contactHandle": "Other contact",
         "contactHandlePlaceholder": "Twitter, Discord, etc. (optional)",
+        "contactPlatforms": {
+          "discord": "Discord",
+          "facebook": "Facebook",
+          "other": "Other"
+        },
+        "contactHandlePlaceholders": {
+          "discord": "Discord username / ID (optional)",
+          "facebook": "Facebook name or link (optional)",
+          "other": "Enter contact details (optional)"
+        },
+        "commissionType": "Commission type",
+        "commissionTypes": {
+          "chibi": "Chibi / Q-style",
+          "bust": "Head & bust",
+          "illustration": "Illustration (thigh-up)",
+          "fullbody": "Full body / standing",
+          "other": "Other"
+        },
+        "commissionTypeOtherPlaceholder": "Briefly describe other type (optional)",
         "purpose": "Purpose",
         "characterDesc": "Character / content description",
         "styleNotes": "Composition / style notes",
@@ -154,7 +173,8 @@
         "errorUpload": "Reference upload failed. Check Storage setup or try again without files.",
         "errorFiles": "Some files have invalid type or size.",
         "errorNotConfigured": "Form service is not configured.",
-        "errorRequiredContent": "Please fill in Purpose or Character / content description."
+        "errorRequiredContent": "Please fill in Purpose or Character / content description.",
+        "errorRequiredTypes": "Please select at least one commission type."
       },
       "twitter": {
         "title": "𝕏 Twitter",

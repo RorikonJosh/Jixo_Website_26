@@ -15,6 +15,8 @@ import AdminReferenceFiles from '../components/AdminReferenceFiles';
 import AdminPortfolioUpload from '../components/AdminPortfolioUpload';
 import AdminPortfolioManage from '../components/AdminPortfolioManage';
 import AdminCollapsibleSection from '../components/AdminCollapsibleSection';
+import { formatCommissionTypes } from '../lib/commissionTypes';
+import { formatContactPlatform } from '../lib/contactPlatform';
 import '../styles/admin.css';
 
 const STATUS_LABELS = {
@@ -37,11 +39,14 @@ function matchesCommissionSearch(item, query) {
     item.name,
     item.email,
     item.contact_handle,
+    item.contact_platform,
     item.purpose,
     item.character_desc,
     item.style_notes,
     item.budget,
     item.usage_type,
+    ...(Array.isArray(item.commission_types) ? item.commission_types : []),
+    item.commission_type_other,
   ]
     .filter(Boolean)
     .join(' ')
@@ -326,7 +331,9 @@ export default function Admin() {
                       <h3>{item.name}</h3>
                       <p className="admin-meta">
                         {item.email}
-                        {item.contact_handle ? ` · ${item.contact_handle}` : ''}
+                        {item.contact_handle || item.contact_platform
+                          ? ` · ${formatContactPlatform(item.contact_platform, item.contact_handle)}`
+                          : ''}
                       </p>
                       <p className="admin-meta">{formatDate(item.created_at)}</p>
                     </div>
@@ -359,6 +366,17 @@ export default function Admin() {
 
                   {expandedId === item.id && (
                     <div className="admin-details">
+                      <p>
+                        <strong>其他聯絡：</strong>
+                        {formatContactPlatform(item.contact_platform, item.contact_handle)}
+                      </p>
+                      <p>
+                        <strong>委託類型：</strong>
+                        {formatCommissionTypes(
+                          item.commission_types,
+                          item.commission_type_other,
+                        )}
+                      </p>
                       <p><strong>用途：</strong>{item.purpose || '—'}</p>
                       <p><strong>角色描述：</strong>{item.character_desc || '—'}</p>
                       <p><strong>構圖 / 畫風：</strong>{item.style_notes || '—'}</p>
