@@ -760,6 +760,36 @@
   justify-content: flex-end;
 }
 
+.admin-portfolio-list-item-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.admin-portfolio-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.88);
+  border: 1px solid rgba(26, 26, 77, 0.1);
+}
+
+.admin-portfolio-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+}
+
+.admin-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
 .admin-badge--featured {
   display: inline-block;
   margin-top: 0.35rem;

@@ -220,4 +220,48 @@ export function buildPortfolioPayload(form) {
   };
 }
 
+/** Metadata-only payload for updating an existing portfolio item (keeps image paths). */
+export function buildPortfolioUpdatePayload(form) {
+  const payload = buildPortfolioPayload({
+    ...form,
+    imagePath: form.imagePath || '',
+    fullsizePath: form.fullsizePath || null,
+  });
+  delete payload.image_path;
+  delete payload.fullsize_path;
+  payload.published = form.published !== false;
+  return payload;
+}
+
+export function portfolioRowToEditForm(row) {
+  let pageTarget = 'artwork';
+  if (row.page_type === 'commission') {
+    pageTarget = row.commission_category === 'r18' ? 'commission_r18' : 'commission_general';
+  }
+
+  return {
+    pageTarget,
+    displayDate: row.display_date || '',
+    platform: row.platform || 'Pixiv',
+    externalLink: row.external_link === '#' ? '' : (row.external_link || ''),
+    titleZh: row.title_zh || '',
+    titleJp: row.title_jp || '',
+    titleEn: row.title_en || '',
+    descZh: row.desc_zh || '',
+    descJp: row.desc_jp || '',
+    descEn: row.desc_en || '',
+    bonusLabelZh: row.bonus_label_zh || '',
+    bonusLabelJp: row.bonus_label_jp || '',
+    bonusLabelEn: row.bonus_label_en || '',
+    bonusTextZh: row.bonus_text_zh || '',
+    bonusTextJp: row.bonus_text_jp || '',
+    bonusTextEn: row.bonus_text_en || '',
+    bonusUrl: row.bonus_url || '',
+    clientZh: row.client_zh || '',
+    clientJp: row.client_jp || '',
+    clientEn: row.client_en || '',
+    published: row.published !== false,
+  };
+}
+
 export { parseDisplayDateToSort };

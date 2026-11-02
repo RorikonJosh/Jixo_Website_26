@@ -158,3 +158,15 @@ export async function setPortfolioFeatured(itemId) {
   if (error) throw error;
   return Boolean(data);
 }
+
+export async function updatePortfolioItem(itemId, payload) {
+  const client = requireClient();
+  const { data, error } = await client.rpc('admin_update_portfolio_item', {
+    input_password: getAdminPassword(),
+    item_id: itemId,
+    payload,
+  });
+  if (error) throw error;
+  if (!data) throw new Error('not_found');
+  return true;
+}

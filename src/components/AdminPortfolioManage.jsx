@@ -6,6 +6,7 @@ import {
 } from '../lib/adminApi';
 import { portfolioUrl } from '../lib/portfolioStorage';
 import AdminConfirmDialog from './AdminConfirmDialog';
+import AdminPortfolioEditForm from './AdminPortfolioEditForm';
 
 const CATEGORY_TABS = [
   { value: 'all', label: '全部' },
@@ -39,6 +40,7 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
   const [error, setError] = useState('');
   const [pendingDelete, setPendingDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
+  const [editingId, setEditingId] = useState(null);
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -90,6 +92,7 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
     try {
       await deletePortfolioItem(pendingDelete);
       setItems((rows) => rows.filter((item) => item.id !== pendingDelete.id));
+      if (editingId === pendingDelete.id) setEditingId(null);
       setMessage('作品已刪除。');
       setPendingDelete(null);
     } catch (err) {
@@ -112,6 +115,13 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
       console.error(err);
       setError('設定失敗。');
     }
+  };
+
+  const handleEditSaved = async () => {
+    setEditingId(null);
+    setMessage('作品已更新。');
+    setError('');
+    await loadItems();
   };
 
   return (
@@ -161,34 +171,57 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
       ) : (
         <ul className="admin-portfolio-list">
           {filteredItems.map((row) => (
-            <li key={row.id} className="admin-portfolio-list-item">
-              <img src={portfolioUrl(row.image_path)} alt="" />
-              <div className="admin-portfolio-list-body">
-                <strong>{row.title_zh || row.title_jp || '—'}</strong>
-                <p className="admin-meta">{pageLabel(row)} · {row.display_date}</p>
-                {row.featured && (
-                  <span className="admin-badge admin-badge--featured">最新展示</span>
-                )}
-              </div>
-              <div className="admin-portfolio-list-actions">
-                {!row.featured && (
+            <li key={row.id} className="admin-portfolio-list-item-wrap">
+              <div className="admin-portfolio-list-item">
+                <img src={portfolioUrl(row.image_path)} alt="" />
+                <div className="admin-portfolio-list-body">
+                  <strong>{row.title_zh || row.title_jp || '—'}</strong>
+                  <p className="admin-meta">{pageLabel(row)} · {row.display_date}</p>
+                  {row.featured && (
+                    <span className="admin-badge admin-badge--featured">最新展示</span>
+                  )}
+                  {!row.published && (
+                    <span className="admin-badge admin-badge--warn">未公開</span>
+                  )}
+                </div>
+                <div className="admin-portfolio-list-actions">
                   <button
                     type="button"
-                    className="admin-btn admin-btn-primary admin-btn--small"
-                    onClick={() => handleSetFeatured(row.id)}
+                    className="admin-btn admin-btn--small"
+                    onClick={() => {
+                      setMessage('');
+                      setError('');
+                      setEditingId((id) => (id === row.id ? null : row.id));
+                    }}
                   >
-                    設為最新展示
+                    {editingId === row.id ? '收起' : '編輯'}
                   </button>
-                )}
-                <button
-                  type="button"
-                  className="admin-btn admin-btn-danger admin-btn--small"
-                  onClick={() => handleDeleteRequest(row)}
-                  disabled={deleting}
-                >
-                  刪除
-                </button>
+                  {!row.featured && (
+                    <button
+                      type="button"
+                      className="admin-btn admin-btn-primary admin-btn--small"
+                      onClick={() => handleSetFeatured(row.id)}
+                    >
+                      設為最新展示
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    className="admin-btn admin-btn-danger admin-btn--small"
+                    onClick={() => handleDeleteRequest(row)}
+                    disabled={deleting}
+                  >
+                    刪除
+                  </button>
+                </div>
               </div>
+              {editingId === row.id && (
+                <AdminPortfolioEditForm
+                  item={row}
+                  onCancel={() => setEditingId(null)}
+                  onSaved={handleEditSaved}
+                />
+              )}
             </li>
           ))}
         </ul>
