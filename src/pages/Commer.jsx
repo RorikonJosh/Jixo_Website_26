@@ -18,6 +18,7 @@ export default function Commer() {
   const prices = t('commer.price.items', { returnObjects: true }) || [];
   const priceNotes = t('commer.price.notes', { returnObjects: true }) || [];
   const processNotes = t('commer.process.notes', { returnObjects: true }) || [];
+  const copyrightSections = t('commer.copyright.sections', { returnObjects: true }) || [];
 
   return (
     <>
@@ -66,19 +67,28 @@ export default function Commer() {
               <p className="muted">{t('commer.process.contact')}</p>
             </div>
 
-            {/* Copyright */}
+            {/* Copyright / usage rules */}
             <div className="rights-section">
               <h3>📝 {t('commer.copyright.title')}</h3>
-              <p className="note">{t('commer.copyright.notice')}</p>
-
-              <hr />
-              
-              <h4 className="sub-title">{t('commer.copyright.designTitle')}</h4>
-
-              <h4>{t('commer.copyright.buyout')}</h4>
-              <p>{t('commer.copyright.buyoutDesc')}</p>
-              <h4>{t('commer.copyright.nobuyout')}</h4>
-              <p>{t('commer.copyright.nobuyoutDesc')}</p>
+              {Array.isArray(copyrightSections) && copyrightSections.map((section, sectionIndex) => (
+                <div key={sectionIndex} className="rights-block">
+                  <h4 className="sub-title">{section.heading}</h4>
+                  <ul className="note-list rights-list">
+                    {(section.items || []).map((item, itemIndex) => (
+                      <li key={itemIndex}>
+                        {item.text}
+                        {Array.isArray(item.children) && item.children.length > 0 && (
+                          <ul className="note-list rights-sublist">
+                            {item.children.map((child, childIndex) => (
+                              <li key={childIndex}>{child}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
 
             <div className="commer-request-section">

@@ -26,9 +26,7 @@
       "r18": "R18 is fine, but not accept R18-G",
       "notes": [
         "Two or more people, the price will be multiplied by the number of the characters.",
-        "If need to design the background will charge additional 300-700NT(Monochrome or white background does not need to increase the price.)",
-        "If need to design the character's costume will charge additional 800NT",
-        "If you dont know the content you want will charge additional 800NT(Which means I need to help you think the content&idea)"
+        "If need to design the background will charge additional 300-700NT(Monochrome or white background does not need to increase the price.)"
       ]
     },
     "process": {
@@ -42,13 +40,49 @@
       "contact": "Welcome to ask if you have any questions of request."
     },
     "copyright": {
-      "title": "Copyright Statement",
-      "notice": "(The copyright of the above-mentioned works belongs to the author himself)",
-      "designTitle": "Design related:",
-      "buyout": "Buying out for over 10,000 NT",
-      "buyoutDesc": "(Which means purchasing full copyright.)",
-      "nobuyout": "Not buying out for over 5,000 NT",
-      "nobuyoutDesc": "(Which means I own the copyright; no resale, modification by others, or commercial use permitted.)"
+      "title": "Commission Usage Rules",
+      "sections": [
+        {
+          "heading": "1. Non-commercial commissions (personal)",
+          "items": [
+            {
+              "text": "Works from non-commercial commissions may only be used for the client's personal collection and non-profit purposes.",
+              "children": []
+            },
+            {
+              "text": "Without the artist's prior consent, commissioned works may not be used for any profit-making activity, including but not limited to:",
+              "children": [
+                "Producing merchandise or other physical goods from the work without permission.",
+                "Using the work for product sales, commercial promotion, or profit-making activities.",
+                "Claiming the work as your own design, drawing, or creation without authorization.",
+                "Modifying the work, making derivatives, or licensing a third party to commercialize or sell it without permission."
+              ]
+            }
+          ]
+        },
+        {
+          "heading": "2. Commercial commissions",
+          "items": [
+            {
+              "text": "If you need commercial use, merchandising, or other profit-making purposes, please tell me before commissioning so licensing terms and fees can be discussed separately.",
+              "children": []
+            },
+            {
+              "text": "Commercial license scope will be agreed case by case based on actual needs, including but not limited to:",
+              "children": [
+                "Platforms and sales channels",
+                "Product types and intended use",
+                "Production quantity and sales scale",
+                "License period and other related usage scope"
+              ]
+            },
+            {
+              "text": "The work may not be used commercially until both parties confirm and authorization is granted.",
+              "children": []
+            }
+          ]
+        }
+      ]
     },
     "requestCta": "Commission request",
     "requestNote": "After reading the guidelines, submit the form to apply."
