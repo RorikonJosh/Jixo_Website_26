@@ -91,6 +91,38 @@ export async function fetchPublicMaintenance() {
   return data?.value === true;
 }
 
+export async function fetchPublicFeaturedTweetUrl() {
+  if (!supabase) return '';
+
+  const { data, error } = await supabase
+    .from('site_settings')
+    .select('value')
+    .eq('key', 'featured_tweet_url')
+    .maybeSingle();
+
+  if (error || data?.value == null) return '';
+  return typeof data.value === 'string' ? data.value : String(data.value);
+}
+
+export async function fetchFeaturedTweetSetting() {
+  const client = requireClient();
+  const { data, error } = await client.rpc('admin_get_featured_tweet', {
+    input_password: getAdminPassword(),
+  });
+  if (error) throw error;
+  return data ?? '';
+}
+
+export async function setFeaturedTweetSetting(tweetUrl) {
+  const client = requireClient();
+  const { data, error } = await client.rpc('admin_set_featured_tweet', {
+    input_password: getAdminPassword(),
+    tweet_url: tweetUrl,
+  });
+  if (error) throw error;
+  return data ?? '';
+}
+
 export const COMMISSION_STATUSES = [
   'pending',
   'reviewing',

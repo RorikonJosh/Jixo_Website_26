@@ -1,58 +1,31 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   adminLogin,
   clearAdminPassword,
-  COMMISSION_STATUSES,
   fetchCommissions,
+  fetchFeaturedTweetSetting,
   fetchMaintenanceSetting,
   isAdminLoggedIn,
+  setFeaturedTweetSetting,
   setMaintenanceSetting,
   updateCommissionStatus,
 } from '../lib/adminApi';
 import { isSupabaseConfigured } from '../lib/supabase';
-import AdminReferenceFiles from '../components/AdminReferenceFiles';
 import AdminPortfolioUpload from '../components/AdminPortfolioUpload';
 import AdminPortfolioManage from '../components/AdminPortfolioManage';
-import AdminCollapsibleSection from '../components/AdminCollapsibleSection';
-import { formatCommissionTypes } from '../lib/commissionTypes';
-import { formatContactPlatform } from '../lib/contactPlatform';
+import AdminCommissionPanel from '../components/AdminCommissionPanel';
+import TweetEmbedPreview from '../components/TweetEmbedPreview';
+import { normalizeTweetUrl } from '../lib/featuredTweet';
 import '../styles/admin.css';
 
-const STATUS_LABELS = {
-  pending: '待處理',
-  reviewing: '審核中',
-  accepted: '已接受',
-  in_progress: '製作中',
-  completed: '已完成',
-  declined: '已婉拒',
-};
-
-function formatDate(value) {
-  if (!value) return '—';
-  return new Date(value).toLocaleString('zh-TW', { hour12: false });
-}
-
-function matchesCommissionSearch(item, query) {
-  if (!query) return true;
-  const haystack = [
-    item.name,
-    item.email,
-    item.contact_handle,
-    item.contact_platform,
-    item.purpose,
-    item.character_desc,
-    item.style_notes,
-    item.budget,
-    item.usage_type,
-    ...(Array.isArray(item.commission_types) ? item.commission_types : []),
-    item.commission_type_other,
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-  return haystack.includes(query);
-}
+const NAV_ITEMS = [
+  { id: 'settings', label: '網站設定', hint: '維護模式' },
+  { id: 'tweet', label: '精選貼文', hint: '首頁最新動態' },
+  { id: 'upload', label: '上傳作品', hint: '發布新作品' },
+  { id: 'portfolio', label: '作品管理', hint: '編輯 / 刪除' },
+  { id: 'commissions', label: '委託管理', hint: '申請與狀態' },
+];
 
 function AdminPageWrap({ children }) {
   return (
@@ -65,23 +38,38 @@ function AdminPageWrap({ children }) {
   );
 }
 
-function AdminShell({ variant = 'login', children }) {
-  if (variant === 'login') {
-    return (
-      <AdminPageWrap>
-        <section className="admin-intro">
-          <div className="brand-card admin-brand-card">
-            <div className="brand-image">
-              <img src="/images/contact.png" alt="" className="brand-img" />
-            </div>
-            <div className="brand-content admin-brand-content">{children}</div>
+function AdminShell({ children }) {
+  return (
+    <AdminPageWrap>
+      <section className="admin-intro">
+        <div className="brand-card admin-brand-card">
+          <div className="brand-image">
+            <img src="/images/contact.png" alt="" className="brand-img" />
           </div>
-        </section>
-      </AdminPageWrap>
-    );
-  }
+          <div className="brand-content admin-brand-content">{children}</div>
+        </div>
+      </section>
+    </AdminPageWrap>
+  );
+}
 
-  return null;
+function PanelCard({ title, subtitle, onClose, children }) {
+  return (
+    <section className="admin-panel-card brand-card admin-brand-card admin-brand-card--settings">
+      <div className="brand-content admin-brand-content">
+        <div className="admin-panel-heading">
+          <div>
+            <h2>{title}</h2>
+            {subtitle && <p className="admin-note">{subtitle}</p>}
+          </div>
+          <button type="button" className="admin-btn admin-btn--small" onClick={onClose}>
+            收起
+          </button>
+        </div>
+        {children}
+      </div>
+    </section>
+  );
 }
 
 export default function Admin() {
@@ -91,12 +79,14 @@ export default function Admin() {
   const [loading, setLoading] = useState(false);
   const [commissions, setCommissions] = useState([]);
   const [maintenance, setMaintenance] = useState(false);
-  const [expandedId, setExpandedId] = useState(null);
+  const [featuredTweetUrl, setFeaturedTweetUrl] = useState('');
+  const [tweetDraft, setTweetDraft] = useState('');
+  const [tweetSaving, setTweetSaving] = useState(false);
+  const [tweetMessage, setTweetMessage] = useState('');
   const [pageError, setPageError] = useState('');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
-  const [r18Filter, setR18Filter] = useState('all');
   const [portfolioRefreshKey, setPortfolioRefreshKey] = useState(0);
+  const [activePanel, setActivePanel] = useState(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('com-bg');
@@ -105,16 +95,28 @@ export default function Admin() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!mobileNavOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [mobileNavOpen]);
+
   const loadDashboard = useCallback(async () => {
     setLoading(true);
     setPageError('');
     try {
-      const [rows, maintenanceEnabled] = await Promise.all([
+      const [rows, maintenanceEnabled, tweetUrl] = await Promise.all([
         fetchCommissions(),
         fetchMaintenanceSetting(),
+        fetchFeaturedTweetSetting(),
       ]);
       setCommissions(rows);
       setMaintenance(maintenanceEnabled);
+      setFeaturedTweetUrl(tweetUrl || '');
+      setTweetDraft(tweetUrl || '');
     } catch (err) {
       console.error(err);
       setPageError('無法載入管理資料。請確認已在 Supabase SQL Editor 執行 admin RPC 設定 SQL。');
@@ -127,17 +129,6 @@ export default function Admin() {
     if (authed) loadDashboard();
   }, [authed, loadDashboard]);
 
-  const normalizedSearch = searchQuery.trim().toLowerCase();
-
-  const filteredCommissions = useMemo(() => {
-    return commissions.filter((item) => {
-      if (statusFilter !== 'all' && item.status !== statusFilter) return false;
-      if (r18Filter === 'yes' && !item.is_r18) return false;
-      if (r18Filter === 'no' && item.is_r18) return false;
-      return matchesCommissionSearch(item, normalizedSearch);
-    });
-  }, [commissions, normalizedSearch, statusFilter, r18Filter]);
-
   const handleLogin = async (event) => {
     event.preventDefault();
     setLoginError('');
@@ -146,6 +137,7 @@ export default function Admin() {
       await adminLogin(password);
       setAuthed(true);
       setPassword('');
+      setActivePanel(null);
     } catch {
       setLoginError('密碼錯誤，或 Admin SQL 尚未執行。');
     } finally {
@@ -157,6 +149,7 @@ export default function Admin() {
     clearAdminPassword();
     setAuthed(false);
     setCommissions([]);
+    setActivePanel(null);
   };
 
   const handleStatusChange = async (id, status) => {
@@ -182,6 +175,42 @@ export default function Admin() {
     }
   };
 
+  const handleFeaturedTweetSave = async (event) => {
+    event.preventDefault();
+    setTweetMessage('');
+    setPageError('');
+    setTweetSaving(true);
+    try {
+      const normalized = normalizeTweetUrl(tweetDraft);
+      if (tweetDraft.trim() && !normalized) {
+        setPageError('請貼上有效的 X / Twitter 貼文網址。');
+        return;
+      }
+      const saved = await setFeaturedTweetSetting(normalized);
+      setFeaturedTweetUrl(saved);
+      setTweetDraft(saved);
+      setTweetMessage(saved ? '首頁精選貼文已更新。' : '已清除首頁精選貼文。');
+    } catch (err) {
+      console.error(err);
+      setPageError('更新精選貼文失敗。');
+    } finally {
+      setTweetSaving(false);
+    }
+  };
+
+  const selectPanel = (id) => {
+    setActivePanel(id);
+    setMobileNavOpen(false);
+    setPageError('');
+  };
+
+  const navHint = (item) => {
+    if (item.id === 'commissions') {
+      return `${commissions.length} 筆`;
+    }
+    return item.hint;
+  };
+
   if (!isSupabaseConfigured) {
     return (
       <AdminShell>
@@ -193,7 +222,7 @@ export default function Admin() {
 
   if (!authed) {
     return (
-      <AdminShell variant="login">
+      <AdminShell>
         <form className="admin-login" onSubmit={handleLogin}>
           <h1>Admin 登入</h1>
           <p className="admin-note">輸入管理密碼以查看委託與網站設定。</p>
@@ -218,13 +247,87 @@ export default function Admin() {
 
   return (
     <AdminPageWrap>
-      <div className="admin-dashboard">
-        <section className="admin-section">
-          <div className="brand-card admin-brand-card admin-brand-card--settings">
-            <div className="brand-content admin-brand-content">
+      <div className="admin-shell">
+        <button
+          type="button"
+          className={`admin-mobile-nav-toggle${mobileNavOpen ? ' is-active' : ''}`}
+          onClick={() => setMobileNavOpen((open) => !open)}
+          aria-expanded={mobileNavOpen}
+          aria-label={mobileNavOpen ? '關閉選單' : '開啟選單'}
+        >
+          <span />
+          <span />
+          <span />
+        </button>
+
+        {mobileNavOpen && (
+          <button
+            type="button"
+            className="admin-sidebar-backdrop"
+            aria-label="關閉選單"
+            onClick={() => setMobileNavOpen(false)}
+          />
+        )}
+
+        <aside className={`admin-sidebar${mobileNavOpen ? ' is-open' : ''}`}>
+          <div className="admin-sidebar-brand">
+            <h1>後台管理</h1>
+            <p className="admin-note">選擇左側項目開啟設定</p>
+          </div>
+
+          <nav className="admin-sidebar-nav" aria-label="後台導覽">
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={`admin-sidebar-link${activePanel === item.id ? ' is-active' : ''}`}
+                onClick={() => selectPanel(item.id)}
+              >
+                <span>{item.label}</span>
+                <small>{navHint(item)}</small>
+              </button>
+            ))}
+          </nav>
+
+          <div className="admin-sidebar-footer">
+            <button type="button" className="admin-btn" onClick={handleLogout}>
+              登出
+            </button>
+          </div>
+        </aside>
+
+        <main className="admin-main">
+          {pageError && (
+            <p className="admin-error admin-error-banner admin-error-standalone">{pageError}</p>
+          )}
+
+          {!activePanel && (
+            <section className="admin-home-card brand-card admin-brand-card admin-brand-card--settings">
+              <div className="brand-content admin-brand-content">
+                <h2>歡迎回來</h2>
+                <p className="admin-note">
+                  左側選單可開啟各項設定。作品管理可點擊縮圖後，左側看圖、右側編輯資料。
+                </p>
+                <div className="admin-home-actions">
+                  <button type="button" className="admin-btn" onClick={() => selectPanel('portfolio')}>
+                    作品管理
+                  </button>
+                  <button type="button" className="admin-btn admin-btn-primary" onClick={() => selectPanel('upload')}>
+                    上傳作品
+                  </button>
+                  <button type="button" className="admin-btn" onClick={() => selectPanel('commissions')}>
+                    委託管理
+                  </button>
+                </div>
+              </div>
+            </section>
+          )}
+
+          {activePanel === 'settings' && (
+            <PanelCard title="網站設定" onClose={() => setActivePanel(null)}>
               <div className="admin-maintenance">
                 <div>
-                  <h2>網站維護模式</h2>
+                  <h3>網站維護模式</h3>
                   <p className="admin-note">
                     開啟後，訪客會看到維護頁面；`/admin` 仍可進入。
                   </p>
@@ -238,175 +341,107 @@ export default function Admin() {
                   {maintenance ? '關閉維護模式' : '開啟維護模式'}
                 </button>
               </div>
-              <div className="admin-settings-footer">
-                <button type="button" className="admin-btn" onClick={handleLogout}>
-                  登出
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <AdminCollapsibleSection
-          title="作品管理"
-          subtitle="管理作品集與委托作品：刪除、設為最新展示"
-          defaultOpen
-        >
-          <AdminPortfolioManage refreshKey={portfolioRefreshKey} />
-        </AdminCollapsibleSection>
-
-        <AdminCollapsibleSection
-          title="上傳新作品"
-          subtitle="發布到作品集或委托作品集頁面"
-          defaultOpen={false}
-        >
-          <AdminPortfolioUpload onPublished={() => setPortfolioRefreshKey((key) => key + 1)} />
-        </AdminCollapsibleSection>
-
-        {pageError && (
-          <p className="admin-error admin-error-banner admin-error-standalone">{pageError}</p>
-        )}
-
-        <AdminCollapsibleSection
-          title="委託管理"
-          subtitle={`共 ${commissions.length} 筆 · 顯示 ${filteredCommissions.length} 筆`}
-          defaultOpen
-          variant="dashboard"
-          headerActions={
-            <button type="button" className="admin-btn" onClick={loadDashboard} disabled={loading}>
-              重新整理
-            </button>
-          }
-        >
-          <div className="admin-filters">
-            <label className="admin-field admin-field--grow">
-              <span>搜尋</span>
-              <input
-                type="search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="姓名、Email、用途、描述…"
-              />
-            </label>
-            <label className="admin-field">
-              <span>狀態</span>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-              >
-                <option value="all">全部狀態</option>
-                {COMMISSION_STATUSES.map((status) => (
-                  <option key={status} value={status}>
-                    {STATUS_LABELS[status] ?? status}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="admin-field">
-              <span>R18</span>
-              <select value={r18Filter} onChange={(e) => setR18Filter(e.target.value)}>
-                <option value="all">全部</option>
-                <option value="yes">是</option>
-                <option value="no">否</option>
-              </select>
-            </label>
-          </div>
-
-          {loading ? (
-            <p className="admin-note admin-loading">載入中…</p>
-          ) : filteredCommissions.length === 0 ? (
-            <section className="admin-panel admin-panel--empty">
-              <p>
-                {commissions.length === 0
-                  ? '目前沒有委託資料。'
-                  : '沒有符合篩選條件的委託。'}
-              </p>
-            </section>
-          ) : (
-            <div className="admin-list">
-              {filteredCommissions.map((item) => (
-                <article key={item.id} className="admin-panel admin-request">
-                  <div className="admin-request-top">
-                    <div>
-                      <h3>{item.name}</h3>
-                      <p className="admin-meta">
-                        {item.email}
-                        {item.contact_handle || item.contact_platform
-                          ? ` · ${formatContactPlatform(item.contact_platform, item.contact_handle)}`
-                          : ''}
-                      </p>
-                      <p className="admin-meta">{formatDate(item.created_at)}</p>
-                    </div>
-                    <label className="admin-status-field">
-                      <span className="admin-status-label">狀態</span>
-                      <span className={`admin-status-capsule admin-status-capsule--${item.status}`}>
-                        <select
-                          value={item.status}
-                          onChange={(e) => handleStatusChange(item.id, e.target.value)}
-                          className={`admin-status-select admin-status-select--${item.status}`}
-                          aria-label="委託狀態"
-                        >
-                          {COMMISSION_STATUSES.map((status) => (
-                            <option key={status} value={status}>
-                              {STATUS_LABELS[status] ?? status}
-                            </option>
-                          ))}
-                        </select>
-                      </span>
-                    </label>
-                  </div>
-
-                  <button
-                    type="button"
-                    className="admin-expand"
-                    onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                  >
-                    {expandedId === item.id ? '收起詳情' : '查看詳情'}
-                  </button>
-
-                  {expandedId === item.id && (
-                    <div className="admin-details">
-                      <p>
-                        <strong>其他聯絡：</strong>
-                        {formatContactPlatform(item.contact_platform, item.contact_handle)}
-                      </p>
-                      <p>
-                        <strong>委託類型：</strong>
-                        {formatCommissionTypes(
-                          item.commission_types,
-                          item.commission_type_other,
-                        )}
-                      </p>
-                      <p><strong>用途：</strong>{item.purpose || '—'}</p>
-                      <p><strong>角色描述：</strong>{item.character_desc || '—'}</p>
-                      <p><strong>構圖 / 畫風：</strong>{item.style_notes || '—'}</p>
-                      <p><strong>預算 (NTD)：</strong>{item.budget || '—'}</p>
-                      <p><strong>希望交稿：</strong>{item.deadline || '—'}</p>
-                      <p><strong>R18：</strong>{item.is_r18 ? '是' : '否'}</p>
-                      <p><strong>用途類型：</strong>{item.usage_type || '—'}</p>
-                      <p><strong>語系：</strong>{item.locale || '—'}</p>
-                      {item.reference_urls?.length > 0 && (
-                        <div>
-                          <strong>參考連結：</strong>
-                          <ul>
-                            {item.reference_urls.map((url) => (
-                              <li key={url}>
-                                <a href={url} target="_blank" rel="noopener noreferrer">{url}</a>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                      {item.reference_files?.length > 0 && (
-                        <AdminReferenceFiles paths={item.reference_files} />
-                      )}
-                    </div>
-                  )}
-                </article>
-              ))}
-            </div>
+            </PanelCard>
           )}
-        </AdminCollapsibleSection>
+
+          {activePanel === 'tweet' && (
+            <PanelCard
+              title="首頁精選貼文"
+              subtitle="貼上 X 貼文網址後可先預覽，確認無誤再儲存。"
+              onClose={() => setActivePanel(null)}
+            >
+              <div className="admin-featured-tweet-layout">
+                <form className="admin-featured-tweet admin-featured-tweet--panel" onSubmit={handleFeaturedTweetSave}>
+                  <label className="admin-field">
+                    <span>貼文網址</span>
+                    <input
+                      type="url"
+                      value={tweetDraft}
+                      onChange={(e) => setTweetDraft(e.target.value)}
+                      placeholder="https://x.com/jixo95821699/status/..."
+                    />
+                  </label>
+                  {featuredTweetUrl && (
+                    <p className="admin-meta">目前已儲存：{featuredTweetUrl}</p>
+                  )}
+                  {tweetMessage && <p className="admin-success">{tweetMessage}</p>}
+                  <div className="admin-featured-tweet-actions">
+                    <button
+                      type="submit"
+                      className="admin-btn admin-btn-primary"
+                      disabled={tweetSaving}
+                    >
+                      {tweetSaving ? '儲存中…' : '儲存貼文'}
+                    </button>
+                    <button
+                      type="button"
+                      className="admin-btn"
+                      disabled={tweetSaving || (!tweetDraft && !featuredTweetUrl)}
+                      onClick={async () => {
+                        setTweetDraft('');
+                        setTweetSaving(true);
+                        setTweetMessage('');
+                        try {
+                          await setFeaturedTweetSetting('');
+                          setFeaturedTweetUrl('');
+                          setTweetMessage('已清除首頁精選貼文。');
+                        } catch (err) {
+                          console.error(err);
+                          setPageError('清除精選貼文失敗。');
+                        } finally {
+                          setTweetSaving(false);
+                        }
+                      }}
+                    >
+                      清除
+                    </button>
+                  </div>
+                </form>
+                <TweetEmbedPreview url={tweetDraft} />
+              </div>
+            </PanelCard>
+          )}
+
+          {activePanel === 'upload' && (
+            <PanelCard
+              title="上傳作品"
+              subtitle="發布到作品集或委托作品集頁面"
+              onClose={() => setActivePanel(null)}
+            >
+              <AdminPortfolioUpload
+                onPublished={() => {
+                  setPortfolioRefreshKey((key) => key + 1);
+                  setActivePanel('portfolio');
+                }}
+              />
+            </PanelCard>
+          )}
+
+          {activePanel === 'portfolio' && (
+            <PanelCard
+              title="作品管理"
+              subtitle="點擊作品縮圖後，左側顯示圖片，右側編輯資料。"
+              onClose={() => setActivePanel(null)}
+            >
+              <AdminPortfolioManage refreshKey={portfolioRefreshKey} />
+            </PanelCard>
+          )}
+
+          {activePanel === 'commissions' && (
+            <PanelCard
+              title="委託管理"
+              subtitle={`共 ${commissions.length} 筆委託申請`}
+              onClose={() => setActivePanel(null)}
+            >
+              <AdminCommissionPanel
+                commissions={commissions}
+                loading={loading}
+                onRefresh={loadDashboard}
+                onStatusChange={handleStatusChange}
+              />
+            </PanelCard>
+          )}
+        </main>
       </div>
     </AdminPageWrap>
   );

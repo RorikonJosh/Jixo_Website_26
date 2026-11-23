@@ -11,7 +11,10 @@
     "usageNotice": "私の作品を使用するの場合は、必ず私を通知してリンクを提供してください。",
     "aiWarning": "※AI学習禁止※",
     "commission": "委託は大歓迎です:",
-    "languages": "中文◯ / English△ / 日本語△"
+    "languages": "中文◯ / English△ / 日本語△",
+    "latestUpdates": "最新の動向",
+    "latestUpdatesNote": "X の最新投稿",
+    "latestUpdatesOpenX": "投稿を読み込めませんでした。X で見る →"
   },
   "commer": {
     "title": "リクエストお知らせ",

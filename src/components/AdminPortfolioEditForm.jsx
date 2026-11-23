@@ -11,6 +11,18 @@ const PAGE_OPTIONS = [
   { value: 'commission_r18', label: '委托作品集 — R18 (/commissions)' },
 ];
 
+const FORM_TABS = [
+  { id: 'basic', label: '基本' },
+  { id: 'copy', label: '文案' },
+  { id: 'extra', label: '進階' },
+];
+
+const LANG_TABS = [
+  { id: 'zh', label: '繁中' },
+  { id: 'jp', label: '日文' },
+  { id: 'en', label: '英文' },
+];
+
 function parsePageTarget(pageTarget) {
   if (pageTarget === 'artwork') {
     return { pageType: 'artwork', commissionCategory: null };
@@ -25,6 +37,8 @@ export default function AdminPortfolioEditForm({ item, onCancel, onSaved }) {
   const [form, setForm] = useState(() => portfolioRowToEditForm(item));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [tab, setTab] = useState('basic');
+  const [lang, setLang] = useState('zh');
 
   const { pageType } = parsePageTarget(form.pageTarget);
   const isCommission = pageType === 'commission';
@@ -39,10 +53,13 @@ export default function AdminPortfolioEditForm({ item, onCancel, onSaved }) {
 
     if (!form.titleZh.trim()) {
       setError('請至少填寫繁中標題。');
+      setTab('copy');
+      setLang('zh');
       return;
     }
     if (!form.displayDate.trim()) {
       setError('請填寫日期。');
+      setTab('basic');
       return;
     }
 
@@ -86,175 +103,221 @@ export default function AdminPortfolioEditForm({ item, onCancel, onSaved }) {
   };
 
   return (
-    <form className="admin-portfolio-edit-form" onSubmit={handleSubmit}>
-      <fieldset className="admin-form-section">
-        <legend>基本資料</legend>
-        <label className="admin-field">
-          <span>顯示頁面</span>
-          <select
-            value={form.pageTarget}
-            onChange={(e) => updateField('pageTarget', e.target.value)}
+    <form className="admin-portfolio-edit-form admin-portfolio-edit-form--compact" onSubmit={handleSubmit}>
+      <div className="admin-edit-tabs" role="tablist" aria-label="編輯分類">
+        {FORM_TABS.map((itemTab) => (
+          <button
+            key={itemTab.id}
+            type="button"
+            role="tab"
+            aria-selected={tab === itemTab.id}
+            className={`admin-edit-tab${tab === itemTab.id ? ' is-active' : ''}`}
+            onClick={() => setTab(itemTab.id)}
           >
-            {PAGE_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>{opt.label}</option>
-            ))}
-          </select>
-        </label>
-        <label className="admin-field">
-          <span>日期（例：2026.3.29）</span>
-          <input
-            type="text"
-            value={form.displayDate}
-            onChange={(e) => updateField('displayDate', e.target.value)}
-            required
-          />
-        </label>
-        {!isCommission && (
-          <label className="admin-field">
-            <span>平台</span>
-            <input
-              type="text"
-              value={form.platform}
-              onChange={(e) => updateField('platform', e.target.value)}
-            />
-          </label>
-        )}
-        <label className="admin-field">
-          <span>外部連結（Pixiv 等）</span>
-          <input
-            type="url"
-            value={form.externalLink}
-            onChange={(e) => updateField('externalLink', e.target.value)}
-            placeholder="https://..."
-          />
-        </label>
-        <label className="admin-checkbox">
-          <input
-            type="checkbox"
-            checked={form.published}
-            onChange={(e) => updateField('published', e.target.checked)}
-          />
-          公開顯示
-        </label>
-      </fieldset>
+            {itemTab.label}
+          </button>
+        ))}
+      </div>
 
-      <fieldset className="admin-form-section">
-        <legend>標題</legend>
-        <label className="admin-field">
-          <span>繁中標題 *</span>
-          <input
-            type="text"
-            value={form.titleZh}
-            onChange={(e) => updateField('titleZh', e.target.value)}
-            required
-          />
-        </label>
-        <label className="admin-field">
-          <span>日文標題</span>
-          <input
-            type="text"
-            value={form.titleJp}
-            onChange={(e) => updateField('titleJp', e.target.value)}
-          />
-        </label>
-        <label className="admin-field">
-          <span>英文標題</span>
-          <input
-            type="text"
-            value={form.titleEn}
-            onChange={(e) => updateField('titleEn', e.target.value)}
-          />
-        </label>
-      </fieldset>
-
-      <fieldset className="admin-form-section">
-        <legend>描述</legend>
-        <label className="admin-field">
-          <span>繁中描述</span>
-          <textarea
-            rows={3}
-            value={form.descZh}
-            onChange={(e) => updateField('descZh', e.target.value)}
-          />
-        </label>
-        <label className="admin-field">
-          <span>日文描述</span>
-          <textarea
-            rows={3}
-            value={form.descJp}
-            onChange={(e) => updateField('descJp', e.target.value)}
-          />
-        </label>
-        <label className="admin-field">
-          <span>英文描述</span>
-          <textarea
-            rows={3}
-            value={form.descEn}
-            onChange={(e) => updateField('descEn', e.target.value)}
-          />
-        </label>
-      </fieldset>
-
-      {isCommission && (
-        <fieldset className="admin-form-section">
-          <legend>委托人（選填）</legend>
-          <label className="admin-field">
-            <span>繁中</span>
+      {tab === 'basic' && (
+        <div className="admin-edit-pane">
+          <div className="admin-form-grid">
+            <label className="admin-field">
+              <span>顯示頁面</span>
+              <select
+                value={form.pageTarget}
+                onChange={(e) => updateField('pageTarget', e.target.value)}
+              >
+                {PAGE_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value}>{opt.label}</option>
+                ))}
+              </select>
+            </label>
+            <label className="admin-field">
+              <span>日期</span>
+              <input
+                type="text"
+                value={form.displayDate}
+                onChange={(e) => updateField('displayDate', e.target.value)}
+                placeholder="2026.3.29"
+                required
+              />
+            </label>
+            {!isCommission && (
+              <label className="admin-field">
+                <span>平台</span>
+                <input
+                  type="text"
+                  value={form.platform}
+                  onChange={(e) => updateField('platform', e.target.value)}
+                />
+              </label>
+            )}
+            <label className="admin-field admin-field--full">
+              <span>外部連結</span>
+              <input
+                type="url"
+                value={form.externalLink}
+                onChange={(e) => updateField('externalLink', e.target.value)}
+                placeholder="https://..."
+              />
+            </label>
+          </div>
+          <label className="admin-checkbox">
             <input
-              type="text"
-              value={form.clientZh}
-              onChange={(e) => updateField('clientZh', e.target.value)}
+              type="checkbox"
+              checked={form.published}
+              onChange={(e) => updateField('published', e.target.checked)}
             />
+            公開顯示
           </label>
-          <label className="admin-field">
-            <span>日文</span>
-            <input
-              type="text"
-              value={form.clientJp}
-              onChange={(e) => updateField('clientJp', e.target.value)}
-            />
-          </label>
-          <label className="admin-field">
-            <span>英文</span>
-            <input
-              type="text"
-              value={form.clientEn}
-              onChange={(e) => updateField('clientEn', e.target.value)}
-            />
-          </label>
-        </fieldset>
+          {isCommission && (
+            <div className="admin-form-grid">
+              <label className="admin-field">
+                <span>委托人（繁中）</span>
+                <input
+                  type="text"
+                  value={form.clientZh}
+                  onChange={(e) => updateField('clientZh', e.target.value)}
+                />
+              </label>
+              <label className="admin-field">
+                <span>委托人（日文）</span>
+                <input
+                  type="text"
+                  value={form.clientJp}
+                  onChange={(e) => updateField('clientJp', e.target.value)}
+                />
+              </label>
+              <label className="admin-field">
+                <span>委托人（英文）</span>
+                <input
+                  type="text"
+                  value={form.clientEn}
+                  onChange={(e) => updateField('clientEn', e.target.value)}
+                />
+              </label>
+            </div>
+          )}
+        </div>
       )}
 
-      <fieldset className="admin-form-section">
-        <legend>FANBOX / 差分資訊（選填）</legend>
-        <label className="admin-field">
-          <span>標籤（繁中）</span>
-          <input
-            type="text"
-            value={form.bonusLabelZh}
-            onChange={(e) => updateField('bonusLabelZh', e.target.value)}
-          />
-        </label>
-        <label className="admin-field">
-          <span>說明（繁中）</span>
-          <input
-            type="text"
-            value={form.bonusTextZh}
-            onChange={(e) => updateField('bonusTextZh', e.target.value)}
-          />
-        </label>
-        <label className="admin-field">
-          <span>連結 URL</span>
-          <input
-            type="url"
-            value={form.bonusUrl}
-            onChange={(e) => updateField('bonusUrl', e.target.value)}
-            placeholder="https://kareya.fanbox.cc/..."
-          />
-        </label>
-      </fieldset>
+      {tab === 'copy' && (
+        <div className="admin-edit-pane">
+          <div className="admin-lang-tabs" role="tablist" aria-label="語系">
+            {LANG_TABS.map((itemLang) => (
+              <button
+                key={itemLang.id}
+                type="button"
+                role="tab"
+                aria-selected={lang === itemLang.id}
+                className={`admin-lang-tab${lang === itemLang.id ? ' is-active' : ''}`}
+                onClick={() => setLang(itemLang.id)}
+              >
+                {itemLang.label}
+              </button>
+            ))}
+          </div>
 
-      <p className="admin-note">圖片路徑維持不變；若要換圖請刪除後重新上傳。</p>
+          {lang === 'zh' && (
+            <div className="admin-edit-lang-block">
+              <label className="admin-field">
+                <span>繁中標題 *</span>
+                <input
+                  type="text"
+                  value={form.titleZh}
+                  onChange={(e) => updateField('titleZh', e.target.value)}
+                  required
+                />
+              </label>
+              <label className="admin-field">
+                <span>繁中描述</span>
+                <textarea
+                  rows={4}
+                  value={form.descZh}
+                  onChange={(e) => updateField('descZh', e.target.value)}
+                />
+              </label>
+            </div>
+          )}
+
+          {lang === 'jp' && (
+            <div className="admin-edit-lang-block">
+              <label className="admin-field">
+                <span>日文標題</span>
+                <input
+                  type="text"
+                  value={form.titleJp}
+                  onChange={(e) => updateField('titleJp', e.target.value)}
+                />
+              </label>
+              <label className="admin-field">
+                <span>日文描述</span>
+                <textarea
+                  rows={4}
+                  value={form.descJp}
+                  onChange={(e) => updateField('descJp', e.target.value)}
+                />
+              </label>
+            </div>
+          )}
+
+          {lang === 'en' && (
+            <div className="admin-edit-lang-block">
+              <label className="admin-field">
+                <span>英文標題</span>
+                <input
+                  type="text"
+                  value={form.titleEn}
+                  onChange={(e) => updateField('titleEn', e.target.value)}
+                />
+              </label>
+              <label className="admin-field">
+                <span>英文描述</span>
+                <textarea
+                  rows={4}
+                  value={form.descEn}
+                  onChange={(e) => updateField('descEn', e.target.value)}
+                />
+              </label>
+            </div>
+          )}
+        </div>
+      )}
+
+      {tab === 'extra' && (
+        <div className="admin-edit-pane">
+          <div className="admin-form-grid">
+            <label className="admin-field">
+              <span>FANBOX 標籤</span>
+              <input
+                type="text"
+                value={form.bonusLabelZh}
+                onChange={(e) => updateField('bonusLabelZh', e.target.value)}
+                placeholder="FANBOX"
+              />
+            </label>
+            <label className="admin-field admin-field--full">
+              <span>差分說明</span>
+              <input
+                type="text"
+                value={form.bonusTextZh}
+                onChange={(e) => updateField('bonusTextZh', e.target.value)}
+              />
+            </label>
+            <label className="admin-field admin-field--full">
+              <span>連結 URL</span>
+              <input
+                type="url"
+                value={form.bonusUrl}
+                onChange={(e) => updateField('bonusUrl', e.target.value)}
+                placeholder="https://kareya.fanbox.cc/..."
+              />
+            </label>
+          </div>
+          <p className="admin-note">圖片路徑維持不變；若要換圖請刪除後重新上傳。</p>
+        </div>
+      )}
 
       {error && <p className="admin-error">{error}</p>}
 

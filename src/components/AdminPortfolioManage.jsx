@@ -40,7 +40,7 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
   const [error, setError] = useState('');
   const [pendingDelete, setPendingDelete] = useState(null);
   const [deleting, setDeleting] = useState(false);
-  const [editingId, setEditingId] = useState(null);
+  const [selectedId, setSelectedId] = useState(null);
 
   const loadItems = useCallback(async () => {
     setLoading(true);
@@ -48,6 +48,10 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
     try {
       const rows = await fetchAdminPortfolioItems();
       setItems(rows);
+      setSelectedId((current) => {
+        if (current && rows.some((row) => row.id === current)) return current;
+        return null;
+      });
     } catch (err) {
       console.error(err);
       setError('無法載入作品列表。');
@@ -63,6 +67,11 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
   const filteredItems = useMemo(
     () => items.filter((row) => matchesCategory(row, category)),
     [items, category],
+  );
+
+  const selectedItem = useMemo(
+    () => filteredItems.find((row) => row.id === selectedId) ?? null,
+    [filteredItems, selectedId],
   );
 
   const categoryCounts = useMemo(() => {
@@ -92,7 +101,7 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
     try {
       await deletePortfolioItem(pendingDelete);
       setItems((rows) => rows.filter((item) => item.id !== pendingDelete.id));
-      if (editingId === pendingDelete.id) setEditingId(null);
+      if (selectedId === pendingDelete.id) setSelectedId(null);
       setMessage('作品已刪除。');
       setPendingDelete(null);
     } catch (err) {
@@ -118,7 +127,6 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
   };
 
   const handleEditSaved = async () => {
-    setEditingId(null);
     setMessage('作品已更新。');
     setError('');
     await loadItems();
@@ -140,6 +148,7 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
         onConfirm={handleDeleteConfirm}
         onCancel={handleDeleteCancel}
       />
+
       <div className="admin-portfolio-toolbar">
         <div className="admin-portfolio-tabs" role="tablist" aria-label="作品分類">
           {CATEGORY_TABS.map((tab) => (
@@ -149,7 +158,10 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
               role="tab"
               aria-selected={category === tab.value}
               className={`admin-portfolio-tab${category === tab.value ? ' is-active' : ''}`}
-              onClick={() => setCategory(tab.value)}
+              onClick={() => {
+                setCategory(tab.value);
+                setSelectedId(null);
+              }}
             >
               {tab.label}
               <span className="admin-portfolio-tab-count">{categoryCounts[tab.value] ?? 0}</span>
@@ -169,62 +181,103 @@ export default function AdminPortfolioManage({ refreshKey = 0 }) {
       ) : filteredItems.length === 0 ? (
         <p className="admin-note">此分類目前沒有作品。</p>
       ) : (
-        <ul className="admin-portfolio-list">
-          {filteredItems.map((row) => (
-            <li key={row.id} className="admin-portfolio-list-item-wrap">
-              <div className="admin-portfolio-list-item">
+        <div className={`admin-portfolio-workspace${selectedItem ? ' has-selection' : ''}`}>
+          <div className="admin-portfolio-gallery">
+            {filteredItems.map((row) => (
+              <button
+                key={row.id}
+                type="button"
+                className={`admin-portfolio-thumb${selectedId === row.id ? ' is-selected' : ''}`}
+                onClick={() => setSelectedId(row.id)}
+              >
                 <img src={portfolioUrl(row.image_path)} alt="" />
-                <div className="admin-portfolio-list-body">
+                <span className="admin-portfolio-thumb-meta">
                   <strong>{row.title_zh || row.title_jp || '—'}</strong>
-                  <p className="admin-meta">{pageLabel(row)} · {row.display_date}</p>
-                  {row.featured && (
-                    <span className="admin-badge admin-badge--featured">最新展示</span>
-                  )}
-                  {!row.published && (
-                    <span className="admin-badge admin-badge--warn">未公開</span>
-                  )}
-                </div>
-                <div className="admin-portfolio-list-actions">
+                  <small>{pageLabel(row)} · {row.display_date}</small>
+                </span>
+                {row.featured && <span className="admin-badge admin-badge--featured">最新</span>}
+              </button>
+            ))}
+          </div>
+
+          <div className="admin-portfolio-detail">
+            {!selectedItem ? (
+              <div className="admin-portfolio-detail-empty">
+                <p>點擊左側作品圖片，即可在此查看與編輯資料。</p>
+              </div>
+            ) : (
+              <>
+                <div className="admin-portfolio-detail-top">
                   <button
                     type="button"
-                    className="admin-btn admin-btn--small"
-                    onClick={() => {
-                      setMessage('');
-                      setError('');
-                      setEditingId((id) => (id === row.id ? null : row.id));
-                    }}
+                    className="admin-btn admin-btn--small admin-portfolio-back"
+                    onClick={() => setSelectedId(null)}
                   >
-                    {editingId === row.id ? '收起' : '編輯'}
+                    ← 返回列表
                   </button>
-                  {!row.featured && (
+                  <div className="admin-portfolio-list-actions">
+                    {!selectedItem.featured && (
+                      <button
+                        type="button"
+                        className="admin-btn admin-btn-primary admin-btn--small"
+                        onClick={() => handleSetFeatured(selectedItem.id)}
+                      >
+                        設為最新展示
+                      </button>
+                    )}
                     <button
                       type="button"
-                      className="admin-btn admin-btn-primary admin-btn--small"
-                      onClick={() => handleSetFeatured(row.id)}
+                      className="admin-btn admin-btn-danger admin-btn--small"
+                      onClick={() => handleDeleteRequest(selectedItem)}
+                      disabled={deleting}
                     >
-                      設為最新展示
+                      刪除
                     </button>
-                  )}
-                  <button
-                    type="button"
-                    className="admin-btn admin-btn-danger admin-btn--small"
-                    onClick={() => handleDeleteRequest(row)}
-                    disabled={deleting}
-                  >
-                    刪除
-                  </button>
+                  </div>
                 </div>
-              </div>
-              {editingId === row.id && (
-                <AdminPortfolioEditForm
-                  item={row}
-                  onCancel={() => setEditingId(null)}
-                  onSaved={handleEditSaved}
-                />
-              )}
-            </li>
-          ))}
-        </ul>
+
+                <div className="admin-portfolio-detail-split">
+                  <aside className="admin-portfolio-detail-media">
+                    <img
+                      src={portfolioUrl(selectedItem.image_path)}
+                      alt={selectedItem.title_zh || selectedItem.title_jp || ''}
+                    />
+                    <div className="admin-portfolio-detail-summary">
+                      <h3>{selectedItem.title_zh || selectedItem.title_jp || '—'}</h3>
+                      <p className="admin-meta">
+                        {pageLabel(selectedItem)} · {selectedItem.display_date}
+                      </p>
+                      {selectedItem.featured && (
+                        <span className="admin-badge admin-badge--featured">最新展示</span>
+                      )}
+                      {!selectedItem.published && (
+                        <span className="admin-badge admin-badge--warn">未公開</span>
+                      )}
+                    </div>
+                    {selectedItem.fullsize_path && (
+                      <a
+                        className="admin-btn admin-btn--small"
+                        href={portfolioUrl(selectedItem.fullsize_path)}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        開啟大圖
+                      </a>
+                    )}
+                  </aside>
+                  <div className="admin-portfolio-detail-form">
+                    <AdminPortfolioEditForm
+                      key={selectedItem.id}
+                      item={selectedItem}
+                      onCancel={() => setSelectedId(null)}
+                      onSaved={handleEditSaved}
+                    />
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

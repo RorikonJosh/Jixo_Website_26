@@ -11,7 +11,10 @@
     "usageNotice": "If you wish to use my artworks, please notify me and provide a link.",
     "aiWarning": "※ AI training prohibited ※",
     "commission": "Commissions are welcome:",
-    "languages": "中文◯ / English△ / 日本語△"
+    "languages": "中文◯ / English△ / 日本語△",
+    "latestUpdates": "Latest Updates",
+    "latestUpdatesNote": "Latest post from X",
+    "latestUpdatesOpenX": "Couldn’t load the post preview. View on X →"
   },
   "commer": {
     "title": "Notice of Request",
