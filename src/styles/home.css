@@ -187,6 +187,18 @@
   line-height: 1.8;
 }
 
+.home-about-intro {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin: 0.15rem 0 0.25rem;
+}
+
+.home-about-intro p {
+  color: var(--home-ink);
+  opacity: 0.88;
+}
+
 .home-about-warn {
   color: #9a2f2f !important;
   font-weight: 700;

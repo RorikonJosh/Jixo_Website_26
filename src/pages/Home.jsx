@@ -14,6 +14,8 @@ export default function Home() {
   const tweetRef = useRef(null);
   const [tweetId, setTweetId] = useState(DEFAULT_TWEET_ID);
   const [embedFailed, setEmbedFailed] = useState(false);
+  const introLines = t('home.intro', { returnObjects: true });
+  const aboutIntro = Array.isArray(introLines) ? introLines : [];
 
   useEffect(() => {
     document.body.classList.add('home-bg');
@@ -99,6 +101,11 @@ export default function Home() {
             </div>
             <div className="home-about-text">
               <h2>{t('home.aboutTitle')}</h2>
+              <div className="home-about-intro">
+                {aboutIntro.map((line, index) => (
+                  <p key={index}>{line}</p>
+                ))}
+              </div>
               <p>{t('home.usageNotice')}</p>
               <p className="home-about-warn">{t('home.aiWarning')}</p>
               <p>

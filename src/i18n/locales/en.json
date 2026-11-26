@@ -10,6 +10,12 @@
     "greetingStart": "Hi! I'm ",
     "greetingName": "kareya",
     "aboutTitle": "About",
+    "intro": [
+      "Hello, I’m a creator who loves drawing freely.",
+      "My work focuses on fan art of game characters, and I also draw original characters from time to time.",
+      "I take personal commissions and commercial collaborations, and I keep enjoying creating and trying new themes.",
+      "I like playing games, and I often find new creative inspiration in them."
+    ],
     "usageNotice": "If you wish to use my artworks, please notify me and provide a link.",
     "aiWarning": "※ AI training prohibited ※",
     "commission": "Commissions are welcome:",
@@ -23,6 +29,12 @@
   },
   "commer": {
     "title": "Notice of Request",
+    "tabs": {
+      "price": "Pricing",
+      "process": "Process",
+      "copyright": "Usage",
+      "request": "Request"
+    },
     "price": {
       "title": "Price reference and explanation",
       "items": [
