@@ -25,19 +25,6 @@
   width: auto;
 }
 
-.admin-dashboard {
-  position: relative;
-  z-index: 1;
-  max-width: 1000px;
-  margin: 0 auto;
-  padding: 5.5rem 2rem 2rem;
-  animation: fadeInUp 0.8s ease-out 0.2s both;
-}
-
-.admin-section + .admin-section {
-  margin-top: 1.5rem;
-}
-
 .admin-intro {
   position: relative;
   z-index: 1;
@@ -64,18 +51,6 @@
   transform: none;
 }
 
-.admin-brand-card--dashboard {
-  flex-direction: column;
-}
-
-.admin-top-banner {
-  height: 120px;
-  background-image: url('/images/jixo_topbanner.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-}
-
 .admin-brand-content h1,
 .admin-brand-content h2,
 .admin-brand-content h3 {
@@ -86,10 +61,6 @@
   font-size: clamp(1.3rem, 2.5vw, 1.7rem);
   font-weight: 700;
   margin: 0;
-}
-
-.admin-brand-content--dashboard {
-  padding-top: 2rem;
 }
 
 .admin-login {
@@ -418,77 +389,6 @@
 .admin-maintenance h3 {
   margin: 0 0 0.35rem;
   font-size: 1.05rem;
-}
-
-/* ===== Admin modal ===== */
-
-.admin-modal-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 11000;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 4.5rem 1rem 1.5rem;
-  overflow: auto;
-  background: rgba(10, 12, 28, 0.52);
-  backdrop-filter: blur(6px);
-}
-
-.admin-modal {
-  width: min(100%, 720px);
-  margin: auto;
-  border-radius: 18px;
-  background: #fff;
-  box-shadow: 0 22px 56px rgba(0, 0, 0, 0.22);
-  max-height: min(90vh, 920px);
-  display: flex;
-  flex-direction: column;
-}
-
-.admin-modal--lg {
-  width: min(100%, 820px);
-}
-
-.admin-modal--xl {
-  width: min(100%, 1040px);
-}
-
-.admin-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  padding: 1.15rem 1.25rem 0.85rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.admin-modal-header h2 {
-  margin: 0 0 0.25rem;
-  color: #1a1a4d;
-  font-size: 1.2rem;
-}
-
-.admin-modal-close {
-  flex-shrink: 0;
-  width: 2.25rem;
-  height: 2.25rem;
-  border: none;
-  border-radius: 999px;
-  background: rgba(26, 26, 77, 0.06);
-  color: #1a1a4d;
-  font-size: 1.4rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.admin-modal-close:hover {
-  background: rgba(26, 26, 77, 0.12);
-}
-
-.admin-modal-body {
-  padding: 1.1rem 1.25rem 1.35rem;
-  overflow: auto;
 }
 
 .admin-commission-panel {
@@ -1030,83 +930,6 @@
   padding-left: 1.2rem;
 }
 
-.admin-brand-card--collapsed .admin-top-banner {
-  height: 88px;
-}
-
-.admin-collapse-bar {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0;
-}
-
-.admin-brand-card--open .admin-collapse-bar {
-  margin-bottom: 1.25rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.admin-collapse-toggle {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.65rem;
-  flex: 1;
-  padding: 0;
-  border: none;
-  background: none;
-  text-align: left;
-  cursor: pointer;
-  color: inherit;
-}
-
-.admin-collapse-toggle:hover .admin-collapse-title {
-  color: #3498db;
-}
-
-.admin-collapse-arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.35rem;
-  height: 1.35rem;
-  margin-top: 0.15rem;
-  font-size: 0.72rem;
-  color: #1a1a4d;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
-}
-
-.admin-collapse-arrow.is-open {
-  transform: rotate(90deg);
-}
-
-.admin-collapse-heading {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.admin-collapse-title {
-  font-size: clamp(1.15rem, 2vw, 1.45rem);
-  font-weight: 700;
-  color: #2c3e50;
-  line-height: 1.35;
-}
-
-.admin-collapse-subtitle {
-  margin: 0;
-}
-
-.admin-collapse-actions {
-  flex-shrink: 0;
-}
-
-.admin-collapse-body {
-  animation: fadeInUp 0.35s ease-out both;
-}
-
 .admin-filters {
   display: grid;
   grid-template-columns: minmax(0, 1.6fr) minmax(140px, 0.7fr) minmax(100px, 0.5fr);
@@ -1182,11 +1005,6 @@
   background: rgba(255, 255, 255, 0.18);
 }
 
-.admin-brand-card--collapsed .admin-brand-content--dashboard {
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
-}
-
 .admin-portfolio-form {
   display: flex;
   flex-direction: column;
@@ -1220,11 +1038,6 @@
   font-size: 0.88rem;
 }
 
-.admin-header--compact {
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-}
-
 .admin-success {
   margin: 0;
   padding: 0.75rem 1rem;
@@ -1239,50 +1052,11 @@
   font-size: 0.82rem;
 }
 
-.admin-portfolio-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
-}
-
-.admin-portfolio-list-item {
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 0.65rem;
-  background: rgba(255, 255, 255, 0.72);
-  border-radius: 10px;
-  border: 1px solid rgba(26, 26, 77, 0.08);
-}
-
-.admin-portfolio-list-item img {
-  width: 56px;
-  height: 56px;
-  object-fit: cover;
-  border-radius: 8px;
-  flex-shrink: 0;
-}
-
-.admin-portfolio-list-item > div,
-.admin-portfolio-list-body {
-  flex: 1;
-  min-width: 0;
-}
-
 .admin-portfolio-list-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.45rem;
   justify-content: flex-end;
-}
-
-.admin-portfolio-list-item-wrap {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
 }
 
 .admin-portfolio-edit-form {
@@ -1408,7 +1182,6 @@
     left: 1rem;
   }
 
-  .admin-dashboard,
   .admin-intro {
     padding: 4.5rem 1rem 1.5rem;
   }
@@ -1564,24 +1337,8 @@
     border-radius: 10px;
   }
 
-  .admin-top-banner {
-    height: 88px;
-  }
-
   .admin-filters {
     grid-template-columns: 1fr;
-  }
-
-  .admin-collapse-bar {
-    flex-direction: column;
-  }
-
-  .admin-collapse-actions {
-    width: 100%;
-  }
-
-  .admin-collapse-actions .admin-btn {
-    width: 100%;
   }
 
   .admin-header,
@@ -1619,18 +1376,6 @@
 
   .admin-btn {
     width: 100%;
-  }
-
-  .admin-modal-overlay {
-    padding: 1rem 0.75rem;
-    align-items: stretch;
-  }
-
-  .admin-modal {
-    width: 100%;
-    max-height: none;
-    min-height: calc(100vh - 2rem);
-    border-radius: 14px;
   }
 
   .admin-portfolio-gallery {

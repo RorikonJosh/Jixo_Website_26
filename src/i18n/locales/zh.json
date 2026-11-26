@@ -7,14 +7,19 @@
     "contact": "聯絡"
   },
   "home": {
-    "greeting": "你好！我是彼夜 kareya",
+    "greetingStart": "你好！我是",
+    "greetingName": "彼夜 kareya",
+    "aboutTitle": "關於",
     "usageNotice": "使用我的作品時，請務必通知我並提供連結。",
     "aiWarning": "※禁止AI學習※",
     "commission": "歡迎委託:",
     "languages": "中文◯ / English△ / 日本語△",
+    "ctaArtworks": "作品集",
+    "ctaCommission": "委託須知",
     "latestUpdates": "最新動態",
     "latestUpdatesNote": "來自 X 的最新貼文",
-    "latestUpdatesOpenX": "無法載入貼文預覽，前往 X 查看 →"
+    "latestUpdatesOpenX": "無法載入貼文預覽，前往 X 查看 →",
+    "connectTitle": "社群"
   },
   "commer": {
     "title": "委託須知",
